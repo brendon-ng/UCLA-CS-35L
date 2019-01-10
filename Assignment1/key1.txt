@@ -54,3 +54,4 @@ Exercise 1.1: Moving around in Emacs
 10. C-x C-c
 
 Exercise 1.2: Deleting text in Emacs
+1. 
