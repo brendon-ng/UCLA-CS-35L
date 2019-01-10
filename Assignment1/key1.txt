@@ -54,4 +54,8 @@ Exercise 1.1: Moving around in Emacs
 10. C-x C-c
 
 Exercise 1.2: Deleting text in Emacs
-1. 
+1. e m a c s SP e x e r 2 . h t m l ENTER
+2. M-g g 1 8 ENTER C-k
+3. C-s D E L ENTER C-a C-k
+4. C-s w i k i C-s M-h C-w
+5. C-s < ! ENTER C-b C-b M-z > C-n M-g g 386 ENTER C-w C-s < ! C-a C-k
