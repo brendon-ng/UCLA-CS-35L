@@ -42,3 +42,15 @@ LABORATORY: Linux and Emacs scavenger hunt
 HOMEWORK: Learning to use Emacs
 
 Exercise 1.1: Moving around in Emacs
+1. e m a c s SP e x e r 1 . h t m l ENTER
+2. C-s H T M L
+3. C-s s c a v e n g e r ENTER M-b
+4. C-s s e l f - r e f e r e n t i a l ENTER M-b M-b
+5. C-s a r r o w ENTER M-b
+6. C-e
+7. C-a
+8. Yes, the emacs command [C-a] to move to the beginning of the current line and [C-e] to move to the end of the current line should be used instead of the arrows.
+9. No, used emacs commands
+10. C-x C-c
+
+Exercise 1.2: Deleting text in Emacs
