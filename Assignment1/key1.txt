@@ -6,7 +6,7 @@ Guangyu Zhou
 Keystrokes
 Assignment 1: Getting to Know Your System
 
-Laboratory: Linux and Emacs scavenger hunt
+LABORATORY: Linux and Emacs scavenger hunt
 1. m a n SP m a n ENTER
 2. w h i c h SP m v ENTER
    w h i c h SP s h ENTER
@@ -37,3 +37,8 @@ Laboratory: Linux and Emacs scavenger hunt
 15. C-h f d i r e d
     C-x C-c
     l s SP - l SP / u s r / b i n ENTER
+
+
+HOMEWORK: Learning to use Emacs
+
+Exercise 1.1: Moving around in Emacs
