@@ -60,3 +60,26 @@ Exercise 1.4: Other editing tasks in Emacs
 8. M-< M-% < o l > ENTER < o L > ENTER !
    Found 7 occurrences
 9. C-x C-s C-x C-c d i f f SP - u SP e x e r 1 . h t m l SP e x e r 4 . h t m l SP > e x e r 4 . d i f f ENTER
+
+Exercise 1.5: Doing commands in Emacs
+1. M-x m - d i r ENTER j u n k ENTER
+2. C-x C-f j u n k / h e l l o . c ENTER
+   (Then copy and pasted code from Assignment page)
+3. M-x c o m p i l e ENTER C-a C-k g c c SP h e l l o . c SP - o SP h e l l o ENTER y
+4. C-x b h e l l o - o u t ENTER C-u M-! . / h e l l o ENTER
+5. C-SP M-> M-w C-x C-f M-0 C-k ~ / k e y 1 . t x t ENTER M-> C-y
+
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n', b = '\\', q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn', b = '%c%c', q = '%c\
+';%c  char const *p = %c%s%c;%c  printf (p, n, n, n, n, b, b, b, q, n, q, p, q, n, n, n, n);%c  r\
+eturn 0;%c}%c";
+  printf (p, n, n, n, n, b, b, b, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+
+Exercise 1.6: Running Elisp code
