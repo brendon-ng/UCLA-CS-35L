@@ -90,6 +90,7 @@ Laboratory: Linux and Emacs scavenger hunt
     I used: [C-h k C-M-r], [C-h	k C-M-s], [C-h	k C-M-t], [C-h	k C-M-u], and [C-h	k C-M-v]
 
 13. During execution of Lisp code, the command C-g causes a quit directly. It runs the command keyboard-quit (found in global-map), which is an interactive compiled Lisp function in 'simple.el'. At top-level, as an editor command, this simply beeps.
+    To find this, I used [C-h k C-g]
 
 14. The yank function reinserts ("paste") the last stretch of killed text.
     It can be easily invoked using C-y
