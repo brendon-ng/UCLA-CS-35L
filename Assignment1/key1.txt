@@ -50,14 +50,13 @@ Exercise 1.4: Other editing tasks in Emacs
   (DELETE-ME)
   M-> C-r D E L E T E C-a C-f C-SP C-e M-w C-r < h 2 > H o m e w o r k C-r C-n C-n C-y ENTER
 
-  (diff, *chinese characters*)
+  (diff, *Chinese characters*)
   M-> C-r d i f f C-r C-a C-f C-SP C-e M-w C-r < h 2 > L a b C-r C-n C-n C-y
 
 5. C-s - - - SP e x e r C-a C-SP M-> C-w
 6. C-x u
-7. M-> - - > C-r - - - e x e r C-a ENTER C-p < ! - - M-% < ! - - ENTER < s t a r t C o m m e n t ENTER SP SP SP SP SP SP C-r < ! - M-% - - > ENTER e n\
- d > ENTER SP SP SP SP SP SP
+7. M-> - - > C-r - - - e x e r C-a ENTER C-p < ! - - M-% < ! - - ENTER < s t a r t C o m m e n t ENTER SP SP SP SP SP SP C-r < ! - M-% - - > ENTER e n d > ENTER SP SP SP SP SP SP
  (Had to replace the HTML comments within the diff output)
-8. M-< M-% < o l > Enter < o L > Enter !
+8. M-< M-% < o l > ENTER < o L > ENTER !
    Found 7 occurrences
-9. C-x C-s C-x C-c d i f f SP - u SP e x e r 1 . h t m l SP e x e r 4 . h t m l SP > e x e r 4 . d i f f Enter
+9. C-x C-s C-x C-c d i f f SP - u SP e x e r 1 . h t m l SP e x e r 4 . h t m l SP > e x e r 4 . d i f f ENTER
