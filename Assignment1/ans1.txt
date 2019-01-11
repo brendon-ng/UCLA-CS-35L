@@ -38,7 +38,32 @@ Laboratory: Linux and Emacs scavenger hunt
 7. To find the all directories located under or in the same directory as /usr/local/cs that were modified in the last four weeks, I used the command [$ find /usr/local/cs -mtime -28 -type d]
    To learn how to do this, I used [$ man find]
    The -mtime -28 argument signifies searching for files modified in the last 28*24 hours. The -type d argument signifies searching for directories only.
-   There were many directories found in the search, too many to list.
+   There were many directories found in the search, too many to list. Here are the first few:
+/usr/local/cs
+/usr/local/cs/src/bison
+/usr/local/cs/src/bison/RCS
+/usr/local/cs/src/grep
+/usr/local/cs/src/grep/RCS
+/usr/local/cs/src/ocaml
+/usr/local/cs/src/ocaml/RCS
+/usr/local/cs/share/info
+/usr/local/cs/share/man/man1
+/usr/local/cs/share/man/man3
+/usr/local/cs/bin
+/usr/local/cs/.del
+/usr/local/cs/.del/grep-3.1
+/usr/local/cs/.del/grep-3.2
+/usr/local/cs/.del/grep-3.2/share
+/usr/local/cs/.del/grep-3.2/share/locale
+/usr/local/cs/.del/grep-3.2/share/locale/af
+/usr/local/cs/.del/grep-3.2/share/locale/af/LC_MESSAGES
+/usr/local/cs/.del/grep-3.2/share/locale/be
+/usr/local/cs/.del/grep-3.2/share/locale/be/LC_MESSAGES
+/usr/local/cs/.del/grep-3.2/share/locale/bg
+/usr/local/cs/.del/grep-3.2/share/locale/bg/LC_MESSAGES
+/usr/local/cs/.del/grep-3.2/share/locale/ca
+/usr/local/cs/.del/grep-3.2/share/locale/ca/LC_MESSAGES
+
 
 8. There are 252 symbolic links in the same directory as find
    I first used [$ whereis find] to get the location of find
@@ -64,10 +89,9 @@ Laboratory: Linux and Emacs scavenger hunt
     To find these, I used the C-h k command that lets you search commands by their keystrokes.
     I used: [C-h k C-M-r], [C-h	k C-M-s], [C-h	k C-M-t], [C-h	k C-M-u], and [C-h	k C-M-v]
 
-13. The	command	C-g runs the command keyboard-quit (found in global-map), which is an interactive compiled Lisp function in ‘simple.el’. During execution of Lisp code, this character causes a quit directly. At top-level, as an editor command, this simply beeps.
-    To find this, I used [C-h k C-g]
+13. During execution of Lisp code, the command C-g causes a quit directly. It runs the command keyboard-quit (found in global-map), which is an interactive compiled Lisp function in 'simple.el'. At top-level, as an editor command, this simply beeps.
 
-14. The yank function Reinserts ("paste") the last stretch of killed text.
+14. The yank function reinserts ("paste") the last stretch of killed text.
     It can be easily invoked using C-y
     I found this by using the command [C-h f] and using "yank" as the input
     [C-h f yank]
