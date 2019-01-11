@@ -1,5 +1,5 @@
 --- exer1.html	2019-01-10 00:03:00.599430000 -0800
-+++ exer4.html	2019-01-10 16:48:49.922860000 -0800
++++ exer4.html	2019-01-10 17:02:38.723628000 -0800
 @@ -42,7 +42,7 @@
  introductions and tutorials.
  </p>
@@ -75,7 +75,7 @@
 + 
 + <h2>Laboratory: Linux and Emacs scavenger hunt</h2>
 + 
-+-<!-- diff，在UNIX系統上的一個工具程式，它可以比較兩個檔案之間的不同。通常它被用來比較同一個檔案，在不同版本間的差異。它可以產生一個擴展名為.diff或.patch的檔案，這個檔案可以被另一個工具程式patch來使用。-->
++-<startComment diff，在UNIX系統上的一個工具程式，它可以比較兩個檔案之間的不同。通常它被用來比較同一個檔案，在不同版本間的差異。它可以產生一個擴展名為.diff或.patch的檔案，這個檔案可以被另一個工具程式patch來使用。end>
 ++
 + 
 + <p>Instructions: Do this assignment on the SEASnet GNU/Linux servers
@@ -84,7 +84,7 @@
 + 
 + <h2>Homework: Learning to use Emacs</h2>
 + 
-+-<!-- DELETE-ME DELETE-ME DELETE-ME -->
++-<startComment DELETE-ME DELETE-ME DELETE-ME end>
 ++
 + 
 + <ul>
@@ -93,9 +93,9 @@
 + 
 + <h2>Submit</h2>
 + 
-+-<!-- You can learn more about HTML comments at
++-<startComment You can learn more about HTML comments at
 +-	<https://en.wikipedia.org/wiki/HTML_comment#Comments>.
-+-	-->
++-	end>
 +-
 + <p>Submit the following two files, in either plain-text or Org format
 + (your choice).</p>
@@ -104,11 +104,11 @@
 + <samp>LC_ALL=C awk '/[^\t\f -~]/' key1.txt ans1.txt #</samp> <em>(if you submit .txt files)</em>
 + </pre>
 + 
-+-<p>should output nothing<!---->.</p>
-+-<!--
++-<p>should output nothing<startCommentend>.</p>
++-<startComment
 +-<p>Or maybe more lines, if something has gone wrong.</p>
 +--<->-
-+--->
++-end>
 ++<p>should output nothing.</p>
 ++
 + 
@@ -118,7 +118,7 @@
 + 
 + </body>
 + </html>
-+-<!-- end of HTML resource -->
++-<startComment end of HTML resource end>
 ++
 +
 +-->
