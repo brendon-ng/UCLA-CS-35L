@@ -1,0 +1,4 @@
+#! /bin/bash
+# testScript --- testing shell scripting
+
+grep Hawaii.. assign2.html
