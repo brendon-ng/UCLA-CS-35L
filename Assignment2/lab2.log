@@ -39,5 +39,34 @@ Laboratory: Spell-checking Hawaiian
 10. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm -23 - words
     This outputs only the first column of the comparison from the previous command. It outputs only the column that shows words in assign2.html but not in the file 'words'
 
-11. 
-   
+11. $ wget http://mauimapp.com/moolelo/hwnwdseng.htm
+    Download html file from the webpage containing an English to Hawaiian list of words.
+
+12. Then, build our 'buildwords' script. Here is the script I wrote with comments on each command's purpose
+
+#! /bin/bash
+# buildwords --- systematically extract Hawaiian words
+
+#delete all instances of English word, will be the first word after <tr> header.
+sed '/<tr>/,/<\/td>/d' |
+
+#extract only the word entries (found between <td> and </td>)
+egrep '<td>.*<\/td>' |
+
+#remove all html tags (1 to 3 characters contained within < and >)
+sed 's/<.\{1,3\}>//g' |
+
+#translate upper case letters to lower case
+tr [:upper:] [:lower:] |
+
+#replace commas with new line
+sed 's/\,/\n/g' |
+
+#replace spaces with new line to separate words
+sed 's/ /\n/g' |
+
+#replace backtick ` with apostrophe '
+sed s/\`/\'/g |
+
+#delete blank lines
+sed '/^$/d' | 
