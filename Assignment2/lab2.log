@@ -1,0 +1,43 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 2: Shell Scripting
+
+Laboratory: Spell-checking Hawaiian
+
+1. $ locale
+   Check to see if I am in standard C locale.
+   It turned I was not
+
+2. $ export LC_ALL='C'
+   Change locale to standard C.
+
+3. $ sort /usr/share/dict/words > words
+   Sort all words in the file /usr/share/dict/words and output them in sorted order line by line
+   Use the > words to redirect the output and store it in new file called words
+   
+4. $ wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/assign2.html
+   Download the HTML file containing this assignment's web page and store it in an HTML file on the Linux server.
+
+5. $ tr -c 'A-Za-z' '[\n*]' < assign2.html
+   This outputs the assign2.html file but every non-letter character is repalced by a new line, so the result is every word on its own individual line with occasionally more than one new line between the words. This happens because the tr command replaces the complement of the string 'A-Za-z' aka anything that is not a letter with the next string '[\n*]' which is a new line.
+
+6. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html
+   This outputs every word in the assign2.html file on its own line and no blank lines. Essentially the same as the last command, but because of -s option, the repetitions of characters in focus (Any character that is not a letter) is treated as a single occurence, so consecutive non-letters are only replaced by one new line instead of multiple.
+
+7. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort
+   This takes the output of the last step, each word of the assign2.html file on its own line and sorts it line by line. This is done by piping the output of the tr command to the input of the sort command.
+
+8. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u
+   This outputs each word of the assign2.html file on its own line, sorted line by line, but only includes one occurence of each word instead of including repetitions like the last command. The -u option in the sort command makes it so only the first instance of repeated words are outputted.
+
+9. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - words
+   This command takes the output of the prevous command (the sorted words from assign2.html) and pipes it to the input of the comm command and compares it to the file words, which holds the words in the English dictionary in sorted order. The comm command creates a 3 column list where the left column has words that only appear in assign2.html, the middle column are words that only appear in the dictionary and not assign2.html and the right column are words included in both documents.
+
+10. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm -23 - words
+    This outputs only the first column of the comparison from the previous command. It outputs only the column that shows words in assign2.html but not in the file 'words'
+
+11. 
+   
