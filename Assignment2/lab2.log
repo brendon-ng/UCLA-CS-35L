@@ -69,4 +69,10 @@ sed 's/ /\n/g' |
 sed s/\`/\'/g |
 
 #delete blank lines
-sed '/^$/d' | 
+sed '/^$/d' |
+
+#deletes lines with non-Hawaiian characters
+sed /[^pkmnwlhaeiou\']/d |
+
+#sort and remove duplicates
+sort -u
