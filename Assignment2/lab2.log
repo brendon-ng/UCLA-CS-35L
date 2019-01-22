@@ -76,3 +76,154 @@ sed /[^pkmnwlhaeiou\']/d |
 
 #sort and remove duplicates
 sort -u
+
+
+13. $ chmod +x buildwords
+    Make 'buildwords' shell script file executable
+
+14. $ cat hwnwdseng.htm | ./buildwords > hwords
+    Take the html file with the Hawaiian and English words, pipe it to the buildwords script to extract just the Hawaiian words and store the output in a new file called 'hwords'
+
+Spell Checking assign2.html for misspelled English words
+15. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words | wc -w
+    Take the assign2.html file, make all upper case characters lower case in order to not count capitalized words as misspelled. Then run the spell checking command using tr, sort, and comm. Use wc -w to count the number of words in the output.
+    Result: 42 Misspelled English words
+
+Spell Checking assign2.html for	misspelled Hawaiian words
+16. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | wc -w
+    Run the same command as the last one, but modify the tr command so that we delete non-Hawaiian characters instead of non-English letters. Also, change the word file we are comparing to from words to hwords.
+    Result: 216 Misspelled Hawaiian words
+
+Spell Checking hwords for misspelled Hawaiian words
+17. $ cat hwords | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | wc -w
+    Same command as the previous one but our input is hwords and we are spell checking it against itself. As expected, the result was 0 misspelled words.
+    Result: 0 Misspelled Hawaiian words
+
+18. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words | comm -12 - hwords
+    Take the words misspelled in English and pipe it to another comm command, comparing it to 'hwords' and displaying only column 3, which are words that are both in the misspelled English list AND in the Hawaiian dictionary.
+    There were three words misspelled in English but not as Hawaiian
+    	  halau
+	  lau
+	  wiki
+
+19. cat assign2.html | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | comm -12 - words
+    Take the words misspelled in Hawaiian and pipe it to another comm command that compares it to English 'words' and display the column that has words that are both in the misspelled Hawaiian list AND the English dictionary.
+    There were 118 words misspelled in Hawaiian but not as English
+    	  a
+	  ail
+	  ain
+	  ake
+	  al
+	  ale
+	  alen
+	  all
+	  am
+	  amp
+	  ample
+	  an
+	  aph
+	  awk
+	  ea
+	  ee
+	  el
+	  em
+	  emp
+	  en
+	  ep
+	  epa	  
+	  h	  
+	  ha
+	  han
+	  hap
+	  hawaiian
+	  he		
+	  hei
+	  hell
+	  hem
+	  hen
+	  hi
+	  hin
+	  ho
+	  home
+	  how
+	  howe
+	  ia
+	  ie
+	  ii
+	  ile
+	  imp
+	  in
+	  io
+	  ion
+	  iou
+	  k
+	  keep
+	  kin
+	  l
+	  lan
+	  le
+	  lea
+	  li
+	  like
+	  line	  
+	  lo
+	  look
+	  lowe
+	  m
+	  mail
+	  main
+	  me
+	  men
+	  mi
+	  ml
+	  mo
+	  n
+	  name
+	  nea	  
+	  nee	  
+	  newline
+	  no
+	  non
+	  none
+	  nu
+	  nul
+	  num
+	  o
+	  oke
+	  ol
+	  om
+	  on
+	  one
+	  op
+	  ope
+	  open
+	  own
+	  p
+	  paul
+ 	  pe
+	  pell
+	  pi
+	  plain
+	  plea
+	  pu
+	  u
+	  ui
+	  ula
+	  ule
+	  ume
+	  ump
+	  un
+	  uni
+	  up
+	  w
+	  wa
+	  wan
+	  we
+	  well
+	  wh
+	  wha
+	  when
+	  who
+	  wi
+	  will
+	  wo
