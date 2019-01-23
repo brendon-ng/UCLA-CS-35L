@@ -15,39 +15,64 @@ Laboratory: Spell-checking Hawaiian
    Change locale to standard C.
 
 3. $ sort /usr/share/dict/words > words
-   Sort all words in the file /usr/share/dict/words and output them in sorted order line by line
+   Sort all words in the file /usr/share/dict/words and output them in sorted 
+   order line by line
    Use the > words to redirect the output and store it in new file called words
    
 4. $ wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/assign2.html
-   Download the HTML file containing this assignment's web page and store it in an HTML file on the Linux server.
+   Download the HTML file containing this assignment's web page and store it 
+   in an HTML file on the Linux server.
 
 5. $ tr -c 'A-Za-z' '[\n*]' < assign2.html
-   This outputs the assign2.html file but every non-letter character is repalced by a new line, so the result is every word on its own individual line with occasionally more than one new line between the words. This happens because the tr command replaces the complement of the string 'A-Za-z' aka anything that is not a letter with the next string '[\n*]' which is a new line.
+   This outputs the assign2.html file but every non-letter character is replaced
+   by a new line, so the result is every word on its own individual line with 
+   occasionally more than one new line between the words. This happens because
+   the tr command replaces the complement of the string 'A-Za-z' aka anything
+   that is not a letter with the next string '[\n*]' which is a new line.
 
 6. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html
-   This outputs every word in the assign2.html file on its own line and no blank lines. Essentially the same as the last command, but because of -s option, the repetitions of characters in focus (Any character that is not a letter) is treated as a single occurence, so consecutive non-letters are only replaced by one new line instead of multiple.
+   This outputs every word in the assign2.html file on its own line and no blank
+   lines. Essentially the same as the last command, but because of -s option,
+   the repetitions of characters in focus (Any character that is not a letter)
+   is treated as a single occurence, so consecutive non-letters are only
+   replaced by one new line instead of multiple.
 
 7. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort
-   This takes the output of the last step, each word of the assign2.html file on its own line and sorts it line by line. This is done by piping the output of the tr command to the input of the sort command.
+   This takes the output of the last step, each word of the assign2.html file
+   on its own line and sorts it line by line. This is done by piping the output
+   of the tr command to the input of the sort command.
 
 8. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u
-   This outputs each word of the assign2.html file on its own line, sorted line by line, but only includes one occurence of each word instead of including repetitions like the last command. The -u option in the sort command makes it so only the first instance of repeated words are outputted.
+   This outputs each word of the assign2.html file on its own line, sorted line
+   by line, but only includes one occurence of each word instead of including
+   repetitions like the last command. The -u option in the sort command makes
+   it so only the first instance of repeated words are outputted.
 
 9. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - words
-   This command takes the output of the prevous command (the sorted words from assign2.html) and pipes it to the input of the comm command and compares it to the file words, which holds the words in the English dictionary in sorted order. The comm command creates a 3 column list where the left column has words that only appear in assign2.html, the middle column are words that only appear in the dictionary and not assign2.html and the right column are words included in both documents.
+   This command takes the output of the prevous command (the sorted words from
+   assign2.html) and pipes it to the input of the comm command and compares it
+   to the file words, which holds the words in the English dictionary in sorted
+   order. The comm command creates a 3 column list where the left column has
+   words that only appear in assign2.html, the middle column are words that
+   only appear in the dictionary and not assign2.html and the right column are
+   words included in both documents.
 
 10. $ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm -23 - words
-    This outputs only the first column of the comparison from the previous command. It outputs only the column that shows words in assign2.html but not in the file 'words'
+    This outputs only the first column of the comparison from the previous
+    command. It outputs only the column that shows words in assign2.html but
+    not in the file 'words'
 
 11. $ wget http://mauimapp.com/moolelo/hwnwdseng.htm
-    Download html file from the webpage containing an English to Hawaiian list of words.
+    Download html file from the webpage containing an English to Hawaiian list
+    of words.
 
-12. Then, build our 'buildwords' script. Here is the script I wrote with comments on each command's purpose
+12. Then, build our 'buildwords' script. Here is the script I wrote with
+    comments on each command's purpose
 
 #! /bin/bash
 # buildwords --- systematically extract Hawaiian words
 
-#delete all instances of English word, will be the first word after <tr> header.
+#delete all instances of English word, will be the first word after <tr> header
 sed '/<tr>/,/<\/td>/d' |
 
 #extract only the word entries (found between <td> and </td>)
@@ -82,32 +107,49 @@ sort -u
     Make 'buildwords' shell script file executable
 
 14. $ cat hwnwdseng.htm | ./buildwords > hwords
-    Take the html file with the Hawaiian and English words, pipe it to the buildwords script to extract just the Hawaiian words and store the output in a new file called 'hwords'
+    Take the html file with the Hawaiian and English words, pipe it to the 
+    build words script to extract just the Hawaiian words and store the output
+    in a new file called 'hwords'
 
 Spell Checking assign2.html for misspelled English words
-15. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words | wc -w
-    Take the assign2.html file, make all upper case characters lower case in order to not count capitalized words as misspelled. Then run the spell checking command using tr, sort, and comm. Use wc -w to count the number of words in the output.
+15. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | 
+	sort -u | comm -23 - words | wc -w
+    Take the assign2.html file, make all upper case characters lower case in 
+    order to not count capitalized words as misspelled. Then run the spell 
+    checking command using tr, sort, and comm. Use wc -w to count the number of
+    words in the output.
     Result: 42 Misspelled English words
 
 Spell Checking assign2.html for	misspelled Hawaiian words
-16. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | wc -w
-    Run the same command as the last one, but modify the tr command so that we delete non-Hawaiian characters instead of non-English letters. Also, change the word file we are comparing to from words to hwords.
+16. $ cat assign2.html | tr [:upper:] [:lower:] | 
+	tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | wc -w
+    Run the same command as the last one, but modify the tr command so that we
+    delete non-Hawaiian characters instead of non-English letters. Also, change
+    the word file we are comparing to from words to hwords.
     Result: 216 Misspelled Hawaiian words
 
 Spell Checking hwords for misspelled Hawaiian words
-17. $ cat hwords | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | wc -w
-    Same command as the previous one but our input is hwords and we are spell checking it against itself. As expected, the result was 0 misspelled words.
+17. $ cat hwords | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' |
+	sort -u | comm -23 - hwords | wc -w
+    Same command as the previous one but our input is hwords and we are spell
+    checking it against itself. As expected, the result was 0 misspelled words
     Result: 0 Misspelled Hawaiian words
 
-18. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words | comm -12 - hwords
-    Take the words misspelled in English and pipe it to another comm command, comparing it to 'hwords' and displaying only column 3, which are words that are both in the misspelled English list AND in the Hawaiian dictionary.
+18. $ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | 
+	sort -u | comm -23 - words | comm -12 - hwords
+    Take the words misspelled in English and pipe it to another comm command,
+    comparing it to 'hwords' and displaying only column 3, which are words that
+    are both in the misspelled English list AND in the Hawaiian dictionary.
     There were three words misspelled in English but not as Hawaiian
     	  halau
 	  lau
 	  wiki
 
-19. cat assign2.html | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords | comm -12 - words
-    Take the words misspelled in Hawaiian and pipe it to another comm command that compares it to English 'words' and display the column that has words that are both in the misspelled Hawaiian list AND the English dictionary.
+19. cat assign2.html | tr [:upper:] [:lower:] | tr -cs "pk\'mnwlhaeiou" '[\n*]'
+	| sort -u | comm -23 - hwords | comm -12 - words
+    Take the words misspelled in Hawaiian and pipe it to another comm command
+    that compares it to English 'words' and display the column that has words
+    that are both in the misspelled Hawaiian list AND the English dictionary.
     There were 118 words misspelled in Hawaiian but not as English
     	  a
 	  ail
