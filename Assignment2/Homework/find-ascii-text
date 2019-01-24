@@ -2,10 +2,13 @@
 # find-ascii-text --- accepts one or more arguments, and outputs a line for each argument that names an ASCII text file
 
 is_ascii(){
-    let nonASCII=`awk '/[^\t\f -~]/' $1 | wc -m`
-    if (($nonASCII==0))
+    if [ -f "$1" ]
     then
-	echo $1
+	let nonASCII=`grep -P -n "[^\x00-\x7F]" $1 | wc -m`
+	if (($nonASCII==0))
+	then
+	    echo $1
+	fi
     fi
 }
 
@@ -13,7 +16,13 @@ for arg in "$@"
 do
     if [ -d $arg ]
     then
-	echo "DIRECTORY"
+	let n=2
+	while (($n<=`find $arg | wc -l`))
+	do
+	    file=`find $arg | sed -n "$n"p`
+	    is_ascii $file
+	    let n=n+1
+	done
     elif [ -f $arg ]
     then
 	is_ascii $arg
