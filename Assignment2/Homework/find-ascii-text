@@ -8,24 +8,25 @@ is_ascii(){
 	let nonASCII=$((`grep -P -c "[^\x00-\x7F]" "$1"`))
 	if (($nonASCII==0))
 	then
-	    echo $1
+	    echo "$1"
 	fi
     fi
 }
 
 for arg in "$@"
 do
-    if [ -d $arg ]
+    newarg=`echo "$arg" | sed 's/ /\\ /g'`
+    if [ -d "$newarg" ]
     then
 	let n=1
-	while (($n<=`find $arg | wc -l`))
+	while (($n<=`find "$newarg" | wc -l`))
 	do
-	    file=`find $arg | sed -n "$n"p`
-	    is_ascii $file
+	    file=`find "$newarg" | sed -n "$n"p`
+	    is_ascii "$file"
 	    let n=n+1
 	done
-    elif [ -f $arg ]
+    elif [ -f "$newarg" ]
     then
-	is_ascii $arg
+	is_ascii "$newarg"
     fi
 done
