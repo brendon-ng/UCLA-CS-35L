@@ -1,0 +1,41 @@
+#! /bin/bash
+# find-utf-8-text --- accepts one or more arguments, and outputs a line for
+# each ASCII file that has the "-*- coding: utf-8 -*-" string in its first
+# line. If directory, recursively searches for such files.
+
+has_header(){
+    let present=$((`grep -n "\-\*\- coding: utf\-8 \-\*\-" "$1" |
+		       sed -n 1p | grep -c "1.*"`))
+    if (($present!=0))
+    then
+	echo $1
+    fi
+}
+
+is_ascii(){
+    if [ -f "$1" ]
+    then
+	let nonASCII=$((`grep -P -c "[^\x00-\x7F]" "$1"`))
+	if (($nonASCII==0))
+	then
+	    has_header "$1"
+	fi
+    fi
+}
+
+for arg in "$@"
+do
+    if [ -d $arg ]
+    then
+	let n=1
+	while (($n<=`find $arg | wc -l`))
+	do
+	    file=`find $arg | sed -n "$n"p`
+	    is_ascii $file
+	    let n=n+1
+	done
+    elif [ -f $arg ]
+    then
+	is_ascii $arg
+    fi
+done
