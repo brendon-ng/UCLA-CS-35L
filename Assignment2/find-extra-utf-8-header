@@ -26,7 +26,12 @@ is_ascii(){
 for arg in "$@"
 do
     newarg=`echo "$arg" | sed 's/ /\\ /g'`
-    if [ `echo "$arg" | head -c 1` == "-" ]; then newarg="./""$arg"; fi
+    
+    if [[ `echo "$arg" | head -c 1` == "-" && -d "$newarg" ]]
+    then
+	newarg="./""$arg"
+    fi
+
     if [ -d "$newarg" ]
     then
 	let n=1
