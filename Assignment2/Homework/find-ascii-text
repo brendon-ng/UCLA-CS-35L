@@ -1,6 +1,14 @@
 #! /bin/bash
 # find-ascii-text --- accepts one or more arguments, and outputs a line for each argument that names an ASCII text file
 
+is_ascii(){
+    let nonASCII=`awk '/[^\t\f -~]/' $1 | wc -m`
+    if (($nonASCII==0))
+    then
+	echo $1
+    fi
+}
+
 for arg in "$@"
 do
     if [ -d $arg ]
@@ -8,11 +16,7 @@ do
 	echo "DIRECTORY"
     elif [ -f $arg ]
     then
-	let nonASCII=`awk '/[^\t\f -~]/' $arg | wc -m`
-	if (($nonASCII==0))
-	then
-	    echo $arg
-	fi
+	is_ascii $arg
     else
 	echo "DOES NOT EXIST"
     fi
