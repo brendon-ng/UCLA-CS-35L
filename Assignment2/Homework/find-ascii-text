@@ -1,5 +1,6 @@
 #! /bin/bash
-# find-ascii-text --- accepts one or more arguments, and outputs a line for each argument that names an ASCII text file
+# find-ascii-text --- accepts one or more arguments, and outputs a line for
+# each argument that names an ASCII text file
 
 is_ascii(){
     if [ -f "$1" ]

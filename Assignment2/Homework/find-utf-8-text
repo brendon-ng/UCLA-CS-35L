@@ -1,10 +1,11 @@
 #! /bin/bash
-# find-ascii-text --- accepts one or more arguments, and outputs a line for each argument that names an ASCII text file
+# find-utf-8-text --- accepts one or more arguments, and outputs a line for
+# each argument that names an non-ASCII or UTF text file
 
-is_ascii(){
+is_not_ascii(){
     if [ -f "$1" ]
     then
-	let nonASCII=`grep -P -n "[^\x00-\x7F]" "$1" | wc -m`
+	let nonASCII=$((`grep -P -c "[^\x00-\x7F]" "$1"`))
 	if (($nonASCII!=0))
 	then
 	    echo $1
@@ -16,15 +17,15 @@ for arg in "$@"
 do
     if [ -d $arg ]
     then
-	let n=2
+	let n=1
 	while (($n<=`find $arg | wc -l`))
 	do
 	    file=`find $arg | sed -n "$n"p`
-	    is_ascii $file
+	    is_not_ascii $file
 	    let n=n+1
 	done
     elif [ -f $arg ]
     then
-	is_ascii $arg
+	is_not_ascii $arg
     fi
 done
