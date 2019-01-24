@@ -1,0 +1,32 @@
+#! /bin/bash
+# buildwords --- systematically extract Hawaiian words
+
+#delete all instances of English word, will be the first word after <tr> header
+sed '/<tr>/,/<\/td>/d' |
+
+#extract only the word entries (found between <td> and </td>)
+egrep '<td>.*<\/td>' |
+
+#remove all html tags (1 to 3 characters contained within < and >)
+sed 's/<.\{1,3\}>//g' |
+
+#translate upper case letters to lower case
+tr [:upper:] [:lower:] |
+
+#replace commas with new line
+sed 's/\,/\n/g' |
+
+#replace spaces with new line to separate words
+sed 's/ /\n/g' |
+
+#replace backtick ` with apostrophe '
+sed s/\`/\'/g |
+
+#delete blank lines
+sed '/^$/d' |
+
+#deletes lines with non-Hawaiian characters
+sed /[^pkmnwlhaeiou\']/d |
+
+#sort and remove duplicates
+sort -u 
