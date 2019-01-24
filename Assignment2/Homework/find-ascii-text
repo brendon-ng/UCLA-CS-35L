@@ -15,7 +15,7 @@ is_ascii(){
 
 for arg in "$@"
 do
-    newarg=`echo "$arg" | sed 's/ /\\ /g'`
+    newarg=`echo "$arg" | sed 's/ /\\ /g'`    
     if [ -d "$newarg" ]
     then
 	let n=1
