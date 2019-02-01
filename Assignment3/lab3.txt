@@ -33,4 +33,19 @@ Laboratory: Installing a small change to a big package
    $ nano INSTALL
    View the INSTALL file to read how the instructions on how to install
 
-   $
+   $ ./configure --prefix=/u/eng/class/classvwt/coreutilsLab3
+   This configures the package, creating a Makefile in each directory in the
+   package. We include a prefix flag with an absolute path for the installation
+   location.
+
+   $ make
+   We run the make command to compile the package
+
+   $ make install
+   This installs the package and creates a directory called coreutilsLab3 in
+   my home directory (absolute path: /u/eng/class/classvwt/coreutilsLab3, or
+   relative path ~/coreutilsLab3)
+
+   There were no problems encountered during this step
+
+3.
