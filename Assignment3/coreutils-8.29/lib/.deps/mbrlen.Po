@@ -1,0 +1,41 @@
+lib/mbrlen.o: lib/mbrlen.c /usr/include/stdc-predef.h lib/config.h \
+ lib/wchar.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/wchar.h lib/stdio.h \
+ /usr/include/stdio.h \
+ /usr/local/cs/gcc-8.2.0/lib/gcc/x86_64-pc-linux-gnu/8.2.0/include/stdarg.h \
+ /usr/include/bits/wchar.h \
+ /usr/local/cs/gcc-8.2.0/lib/gcc/x86_64-pc-linux-gnu/8.2.0/include/stddef.h \
+ /usr/include/xlocale.h /usr/include/bits/wchar2.h
+
+/usr/include/stdc-predef.h:
+
+lib/config.h:
+
+lib/wchar.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/wchar.h:
+
+lib/stdio.h:
+
+/usr/include/stdio.h:
+
+/usr/local/cs/gcc-8.2.0/lib/gcc/x86_64-pc-linux-gnu/8.2.0/include/stdarg.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/local/cs/gcc-8.2.0/lib/gcc/x86_64-pc-linux-gnu/8.2.0/include/stddef.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/bits/wchar2.h:

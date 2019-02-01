@@ -7,3 +7,30 @@ Assignment 3: Modifying and rewriting software
 
 Laboratory: Installing a small change to a big package
 
+1. $ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+   $ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+   $ wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+   Grabbed the Coreutils 8.29 source code compressed tarball, signature
+   and GNU keyring.
+
+   $ gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
+   Verify the signature with the GNU keyring
+   Problems:
+	WARNING: options in `/u/eng/class/classvwt/.gnupg/gpg.conf' are not yet
+	active during this run
+	WARNING: This key is not certified with a trusted signature!
+   These warnings occur because it is a public key and it has not been verified
+   by the user.
+
+2. $ tar -xvf coreutils-8.29.tar.xz
+   Used tar command to unzip the Coreutils file, the option -x meaning extract
+   the files. -f creates a new directory with all these files called
+   coreutils-8.29
+
+   $ cd coreutils-8.29
+   enter the coreutils directory
+
+   $ nano INSTALL
+   View the INSTALL file to read how the instructions on how to install
+
+   $
