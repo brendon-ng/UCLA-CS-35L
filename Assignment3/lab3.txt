@@ -48,4 +48,10 @@ Laboratory: Installing a small change to a big package
 
    There were no problems encountered during this step
 
-3.
+3. $ ~/coreutilsLab3/bin/ls -aA
+   We run the installed ls command to try to reproduce the bug. When running
+   this command with the -aA options, we see that the -a overrides the -A as my
+   directory contents were shown, including . and .. along with other files
+   beginning with a . so the bug is still present.
+
+4. 
