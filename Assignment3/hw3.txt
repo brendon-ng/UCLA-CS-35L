@@ -1,0 +1,51 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 3: Modifying and rewriting software
+
+Homework Questions Q1-Q4
+
+Q1. The peformance of the ls command is improved by the patch because the ouput
+    of the ls command is now more consistent with the order of the flags we
+    pass to it. It now makes more sense that if we use a -aA flag, the -A
+    overrides the -a and if we use a -Aa flag, the -a overrides the -A.
+    The efficiency, however of the ls command is made worse by the patch. This
+    is because an extra check was added to hide the . and .. directories.
+
+Q2. If my company were to adpot this patched version of Coreutils instead of
+    the default one, we would have to watch out for the order of our flags and
+    for anything that may be being overridden.
+
+Q3. When we invoke the script on an empty file like /dev/null, we get an error
+    as follows:
+Traceback (most recent call last):
+  File "randline.py", line 70, in <module>
+    main()
+  File "randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/local/cs/Python-2.7.15/lib/python2.7/random.py", line 277, in
+       choice
+    return seq[int(self.random() * len(seq))]  # raises IndexError if seq is
+    empty
+IndexError: list index out of range
+
+We get an out of range error because there are zero lines in the file inputted.
+The function chooseline() calls random.choice() with an empty sequence because
+the file has no content. This raises an IndexError when called with an empty
+sequence.
+
+Q4. When we run this script with Python 3, we get a synatax error as follows:
+      File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+    SyntaxError: invalid syntax
+
+    This syntax error arises because some syntax rules changed from Python 2 to
+    Python 3. One of these included the statement
+    `except IOError as (errno, strerror):` being invalid in Python 3. While it
+    is valid in Python 2, it needs to be changed to `except IOError as err:" in
+    Python 3.
