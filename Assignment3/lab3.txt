@@ -54,4 +54,39 @@ Laboratory: Installing a small change to a big package
    directory contents were shown, including . and .. along with other files
    beginning with a . so the bug is still present.
 
-4. 
+4. $ cd coreutils-8.29
+   Enter the coreutils directory
+
+   $ emacs patch.diff
+   Created a new file, "patch.diff" that will be our patch file where we copy
+   and paste the patch from Bug#30963 Message #10.
+
+   Copy and pasted the patch file from the website and then used
+   C-x C-s C-x C-c to save and exit the new file.
+
+   $ patch -p1 < patch.diff
+   This applies the patch with the flag p1 to strip the smallest prefix
+   containing 1 leading slash from each file name found in the patch file
+
+   There were no problems encountered during this step
+
+5. $ autoreconf -f -i
+   Update our make configurations to prepare to compile the patched package
+   with make again.
+
+   $ make
+   Now we run make at the highest level in our coreutils-8.29 directory.
+   Since we have already called the make command before, this time around it
+   only has to compile files that are related to the patch so less commands are
+   executed.
+
+   $ make install
+   Installs the package
+
+6. $ ~/coreutilsLab3/bin/ls -aA
+   Test the newly modified command to see if the -A overrides the -a.
+   Output:
+   coreutils-8.29	  coreutils-8.29.tar.xz.sig	lab3.txt
+   coreutils-8.29.tar.xz  gnu-keyring.gpg
+
+   There is no . or .. outputted so we can see that the bug has been fixed
