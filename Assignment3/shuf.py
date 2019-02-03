@@ -21,8 +21,8 @@ class shuf:
         if self.length == 0 or self.headCount == 0:
             return
         if self.forever:
-            while(true):
-                index = random.random() * self.length
+            while(True):
+                index = int(random.random() * self.length)
                 sys.stdout.write(self.inputLines[index])
             return
         if not self.repeat:
@@ -31,7 +31,8 @@ class shuf:
                 sys.stdout.write(self.inputLines[i])
         if self.repeat:
             for t in range(self.headCount):
-                sys.stdout.write(self.inputLines[random.random()*self.length])
+                index = int(random.random()*self.length)
+                sys.stdout.write(self.inputLines[index])
 
 def main():
     version_msg = "%prog 1.0"
