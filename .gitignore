@@ -10,3 +10,5 @@ Assignment3/coreutils*
 Assignment3/gnu-keyring.gpg
 Assignment3/test.txt
 Assignment3/randline.py
+Assignment1/files/*.html
+Assignment2/*htm*
