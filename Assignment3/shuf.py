@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import random, sys, string
+import random, sys
 from optparse import OptionParser
 
 class shuf:
@@ -17,7 +17,6 @@ class shuf:
             self.headCount = self.length
         elif headCount > len(self.inputLines) and not repeat:
             self.headCount = self.length
-
 
     def printPerm(self):
         if self.length == 0 or self.headCount == 0:
@@ -52,6 +51,7 @@ Write a random permutation of the input lines to standard output.
     
 With no FILE, or when FILE is -, read standard input."""
 
+    # Parse option flags
     parser = OptionParser(version=version_msg, usage=usage_msg)
     parser.add_option("-i", "--input-range", action="store", dest="range",
                       help='treat each number in RANGE (Where RANGE is "LO-HI") as an input line')
@@ -136,7 +136,7 @@ With no FILE, or when FILE is -, read standard input."""
             strerror = e.strerror
             parser.error("I/O error({0}): {1}".format(errno, strerror))
             
-
+    #Generate and print randomly shuffled lines
     generator = shuf(inputLines, inputRange, headCount, repeat, args)
     generator.printPerm()
     
