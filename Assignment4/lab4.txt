@@ -162,10 +162,11 @@ Laboratory: Debugging a C program
     C-x C-s C-x C-c
     To save and quit emacs
 
-13. $ diff -u coreutils-with-bug/lib/timespec.h timespec.h > lab4.diff
+13. $ diff -u coreutils-with-bug/lib/timespec.h timespec.h > coreutils-with-bug/lab4.diff
     Create patch file (.diff file) for the fixed overflow problem in a .diff file
 
-14. $ emacs lab4.diff
+14. $ cd coreutils-with-bug
+    $ emacs lab4.diff
     C-x 4 a
 
     2019-02-06  Brendon Tetsuo Ng  <classvwt@lnxsrv07.seas.ucla.edu>
@@ -173,13 +174,14 @@ Laboratory: Debugging a C program
 	due to subtraction that occurred when dealing with files very long apart.
 
    Edit the file and make it into the form of a ChangeLog entry. Paste our
-   entry into the diff file
+   entry into the diff file. Also, make sure we have correct paths by using
+   the relative path to the timespec.h file from the patch file
+   (lib/timespec.h)
  
 15. $ patch -p0 < lab4.diff
     Apply patch
 
-16. $ cd coreutils-with-bug
-    $ make
+16. $ make
     $ make install
     Compile and install the fixed program
 
@@ -192,8 +194,8 @@ Laboratory: Debugging a C program
     $ TZ=UTC0 ~/coreutilsLab4/bin/ls -lt --full-time wwi-armistice now now1
 
     We now get the output:
-    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:29:52.154780835 +0000 now1
-    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:29:46.702629839 +0000 now
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 18:45:17.727756096 +0000 now1
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 18:45:11.955561716 +0000 now
     -rw-r--r-- 1 classvwt class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
 
     So the bug has been fixed because we now see wwi-armistice as the oldest
@@ -208,8 +210,8 @@ Laboratory: Debugging a C program
 
     We get the output:
     -rw-r--r-- 1 classvwt class 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
-    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:38:48.738953000 +0000 now1
-    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:38:41.715419000 +0000 now
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 18:46:16.926987000 +0000 now1
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 18:46:11.744162000 +0000 now
 
     This output has an error in that it treats wwi-armistice as if it is from 2054.
     This is because the Unix time format stores timestamps as 32-bit integers as
