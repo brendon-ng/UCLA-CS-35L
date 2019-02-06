@@ -83,25 +83,137 @@ Laboratory: Debugging a C program
     Open gdb debugger for the code for the ls command to find the bug
 
 11. Find the bug
-    (gdb) break main
-    We will 'next' through main to find the function calls and identify which
-    one of them may be causing the bug and set a breakpoint on them.
-    (gdb) run -lt --full-time /tmp/tmp.C3kV9heana
-    Run the program, stopping at our breakpoint, we will use the 'next' command
-    to step through each function call.
-    (gdb) next  [[Many times]]
-    (gdb) break gobble_file
-    I do not know what this would do by reading the name so I chose to explore it
+    (gdb) info functions
+    This displays all the functions that can be called during the program. I
+    scrolled to ls.c where the main functions are and identified which of them
+    may be causing the bug and set a breakpoint on them.
     (gdb) break sort_files
     This is probably where the bug will occur because we are experiencing an
     error in the sorting by time
+    (gdb) break compare_mtime
+    I also found this function in the list. Our problem is probably in the
+    comparison of modify time because the bug involves the timestamp sorting.
     (gdb) run -lt --full-time /tmp/tmp.C3kV9heana
-    Run again
-    (gdb) continue
-    Run until first breakpoint (gobble_file function)
+    Run the program with the -lt flag in the temporary directory we created.
+    Will stop at our first breakpoint. (sort_files function)
     (gdb) step  [[Many times]]
-    Step through gobble_file function, we find there is nothing abnormal that
-    would be the source of our bug
+    Step through sort_files function, we find that the function compare_mtime()
+    was indeed called in the line
+    "func = sort_reverse ? rev_cmp_mtime : compare_mtime;"
+    Because of the -lt flags, sort_reverse is false, so compare_mtime() is called.
+    (gdb) continue  [[two times]]
+    Run until the next breakpoint (compare_mtime function)
+    (gdb) step  [[Many times]]
+    We find that the compare_mtime function calls another function called
+    cmp_mtime. The bug could be in there.
+    (gdb) break cmp_mtime
+    Set the breakpoint at this function so we can look into it
     (gdb) continue
-    Run until the next breakpoint (sort_files function)
-    (gdb) step
+    Run until next breakpoint (cmp_mtime)
+    (gdb) step [[Many times]]
+    We see that another cuntion is called (timespec_cmp) that is doing the
+    comparison of the timestamps
+    (gdb) break timespec_cmp
+    Set breakpoint at this newly discovered function to look into it
+    (gdb) continue
+    Run until the next breakpoint (timespec_cmp function)
+    (gdb) list
+    Display the contents of this function
+       43	/* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+       44	   Assume the nanosecond components are in range, or close to it.  */
+       45	static inline int
+       46	timespec_cmp (struct timespec a, struct timespec b)
+       47	{
+       48	  int diff = a.tv_sec - b.tv_sec;
+       49	  return diff ? diff : a.tv_nsec - b.tv_nsec;
+       50	}
+       51	
+       52	# if ! HAVE_DECL_NANOSLEEP
+
+    We see that a potential source of the problem is that the difference in time
+    is being evaluatd by the expression `int diff = a.tv_sec - b.tv_sec;` which
+    takes the difference in nano-seconds of the modify time of the two files
+    being compared. Since the wwi-armistice is so old, the difference in nano
+    seconds is a huge number, way too large, causing an overflow. When diff is
+    a too-large negative number causing an overflow, it overflows to a posititve
+    integer, making the wwi-armistice file be far in the future instead of far
+    in the past.
+
+    (gdb) quit
+    We have identified the bug and will now fix it
+
+12. Fix the bug
+    $ cp coreutils-with-bug/lib/timespec.h timespec.h
+    Copy the timespec.h to our current directory so we can edit it
+    $ emacs timespec.h
+    Open it to edit it
+    We change the function to the following to avoid the subtraction and overflow:
+    timespec_cmp (struct timespec a, struct timespec b)
+    {
+	if (a.tv_sec < b.tv_sec)
+    	   return -1;
+  	else if (a.tv_sec == b.tv_sec)
+    	   return 0;
+  	else
+	   return 1;
+    }
+
+    C-x C-s C-x C-c
+    To save and quit emacs
+
+13. $ diff -u coreutils-with-bug/lib/timespec.h timespec.h > lab4.diff
+    Create patch file (.diff file) for the fixed overflow problem in a .diff file
+
+14. $ emacs lab4.diff
+    C-x 4 a
+
+    2019-02-05  Brendon Tetsuo Ng  <classvwt@lnxsrv07.seas.ucla.edu>
+
+        * timespec.h (timespec_cmp): Use comparison operators to prevent overflow
+	due to subtraction that occurred when dealing with files very long apart.
+
+   Edit the file and make it into the form of a ChangeLog entry. Paste our
+   entry into the diff file
+ 
+15. $ patch -p0 < lab4.diff
+    Apply patch
+
+16. $ make
+    $ make install
+    Compile and install the fixed program
+
+17. $ tmp=$(mktemp -d)
+    $ cd $tmp
+    $ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+    $ touch now
+    $ sleep 1
+    $ touch now1
+    $ TZ=UTC0 ~/coreutilsLab4/bin/ls -lt --full-time wwi-armistice now now1
+
+    We now get the output:
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:29:52.154780835 +0000 now1
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:29:46.702629839 +0000 now
+    -rw-r--r-- 1 classvwt class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+
+    So the bug has been fixed because we now see wwi-armistice as the oldest
+    file of the three which it should be.
+
+18. Test in home directory instead of $tmp
+    $ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+    $ touch now
+    $ sleep 1
+    $ touch now1
+    $ TZ=UTC0 ~/coreutilsLab4/bin/ls -lt --full-time wwi-armistice now now1
+
+    We get the output:
+    -rw-r--r-- 1 classvwt class 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:38:48.738953000 +0000 now1
+    -rw-r--r-- 1 classvwt class 0 2019-02-06 08:38:41.715419000 +0000 now
+
+    This output has an error in that it treats wwi-armistice as if it is from 2054.
+    This is because the Unix time format stores timestamps as 32-bit integers as
+    a value of the number of seconds since 1/1/1970. Instead of handling a negative
+    integer since 1918 is way before 1970, it treats it as a positive integer and
+    results in a date in the future. The local linux file system uses 64 bit and
+    the SEASnet server uses 32 bit NF system, so the negative value is lost in
+    truncation.

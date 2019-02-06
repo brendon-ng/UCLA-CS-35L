@@ -12,3 +12,6 @@ Assignment3/test.txt
 Assignment3/randline.py
 Assignment1/files/*.html
 Assignment2/*htm*
+Assignment4/coreutils*
+ChangeLog
+Assignment4/*.orig
