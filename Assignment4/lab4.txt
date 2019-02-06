@@ -168,8 +168,7 @@ Laboratory: Debugging a C program
 14. $ emacs lab4.diff
     C-x 4 a
 
-    2019-02-05  Brendon Tetsuo Ng  <classvwt@lnxsrv07.seas.ucla.edu>
-
+    2019-02-06  Brendon Tetsuo Ng  <classvwt@lnxsrv07.seas.ucla.edu>
         * timespec.h (timespec_cmp): Use comparison operators to prevent overflow
 	due to subtraction that occurred when dealing with files very long apart.
 
