@@ -76,6 +76,7 @@ Laboratory: Debugging a C program
    -rw-r--r-- 1 classvwt class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
    -rw-r--r-- 1 classvwt class 0 2019-02-06 05:30:33.195710295 +0000 now1
    -rw-r--r-- 1 classvwt class 0 2019-02-06 05:30:27.547555261 +0000 now
+
    It treats the first file as the newest file of the 3. It should be below the
    "now" file as it is the oldest one but it is being treated as from the future.
 
@@ -89,7 +90,7 @@ Laboratory: Debugging a C program
     may be causing the bug and set a breakpoint on them.
     (gdb) break sort_files
     This is probably where the bug will occur because we are experiencing an
-    error in the sorting by time
+    error in the sorting by time. Create a breakpoint here.
     (gdb) break compare_mtime
     I also found this function in the list. Our problem is probably in the
     comparison of modify time because the bug involves the timestamp sorting.
@@ -111,7 +112,7 @@ Laboratory: Debugging a C program
     (gdb) continue
     Run until next breakpoint (cmp_mtime)
     (gdb) step [[Many times]]
-    We see that another cuntion is called (timespec_cmp) that is doing the
+    We see that another function is called (timespec_cmp) that is doing the
     comparison of the timestamps
     (gdb) break timespec_cmp
     Set breakpoint at this newly discovered function to look into it
@@ -178,7 +179,8 @@ Laboratory: Debugging a C program
 15. $ patch -p0 < lab4.diff
     Apply patch
 
-16. $ make
+16. $ cd coreutils-with-bug
+    $ make
     $ make install
     Compile and install the fixed program
 
