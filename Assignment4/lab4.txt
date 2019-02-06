@@ -1,0 +1,107 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 4: C Programming and debugging
+
+Laboratory: Debugging a C program
+
+1. $ wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils-with-bug.tar.gz
+   Use wget to download old version of coreutils with a bug.
+
+2. $ tar -xvf coreutils-with-bug.tar.gz
+   Extract the contents of the coreutils file (or unzip it). This creates a new
+   directory called "coreutils-with-bug".
+
+3. $ cd coreutils-with-bug
+   $ ./configure --prefix=/u/eng/class/classvwt/coreutilsLab4
+   Enter the coreutils-with-bug direcotry and execute the configute script.
+   This creates a makefile in each directory of the package. We also specify
+   the absolute path for installation with the --prefix flag.
+
+4. $ make
+   Run make command to compile the package
+   When we run $ make we run into an error as follows:
+   In file included from utimecmp.c:41:
+   utimens.h:2:5: error: conflicting types for 'futimens'
+     int futimens (int, char const *, struct timespec const [2]);
+     	 ^~~~~~~~
+   In file included from utimecmp.h:25,
+                    from utimecmp.c:25:
+   /usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+   extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^~~~~~~~
+
+   This error is thrown because it is trying to redefine the function which you
+   cannot do and will throw an error. It is trying to redefine the same
+   function with different parameters in a different place.
+
+5. $ wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils.diff
+   Use wget to download coreutils.diff patch.
+
+6. $ patch -p0 < coreutils.diff
+   This applies the patch with the flag p0 to strip the smallest prefix
+   containing no leading slash from each file name found in the patch file
+
+7. $ make
+   Compile the package - runs successfully this time
+
+8. $ make install
+   This installs the package and creates a directory called coreutilsLab4 in
+   my home directory
+
+   This time around, make and make install encountered no problems.
+   The patch fixed the following things:
+   changed
+   futimens (int fd ATTRIBUTE_UNUSED, char const *file, struct timespec const timespec[2])
+   to
+   coreutils_futimens (int fd ATTRIBUTE_UNUSED, char const *file, struct timespec const timespec[2])
+   this gets rid of the redeclaration attempt of the function by renaming it.
+   It change
+   static bool tee (int nfiles, const char **files)
+   to
+   static bool coreutils_tee (int nfiles, const char **files)
+   this also gets rid of the redeclaration attempt by renaming it.
+
+9. Reproduce the problem:
+   $ tmp=$(mktemp -d)
+   $ cd $tmp
+   $ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+   $ touch now
+   $ sleep 1
+   $ touch now1
+   $ TZ=UTC0 ~/coreutilsLab4/bin/ls -lt --full-time wwi-armistice now now1
+   We get the result:
+   -rw-r--r-- 1 classvwt class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+   -rw-r--r-- 1 classvwt class 0 2019-02-06 05:30:33.195710295 +0000 now1
+   -rw-r--r-- 1 classvwt class 0 2019-02-06 05:30:27.547555261 +0000 now
+   It treats the first file as the newest file of the 3. It should be below the
+   "now" file as it is the oldest one but it is being treated as from the future.
+
+10. $ gdb ~/coreutilsLab4/bin/ls
+    Open gdb debugger for the code for the ls command to find the bug
+
+11. Find the bug
+    (gdb) break main
+    We will 'next' through main to find the function calls and identify which
+    one of them may be causing the bug and set a breakpoint on them.
+    (gdb) run -lt --full-time /tmp/tmp.C3kV9heana
+    Run the program, stopping at our breakpoint, we will use the 'next' command
+    to step through each function call.
+    (gdb) next  [[Many times]]
+    (gdb) break gobble_file
+    I do not know what this would do by reading the name so I chose to explore it
+    (gdb) break sort_files
+    This is probably where the bug will occur because we are experiencing an
+    error in the sorting by time
+    (gdb) run -lt --full-time /tmp/tmp.C3kV9heana
+    Run again
+    (gdb) continue
+    Run until first breakpoint (gobble_file function)
+    (gdb) step  [[Many times]]
+    Step through gobble_file function, we find there is nothing abnormal that
+    would be the source of our bug
+    (gdb) continue
+    Run until the next breakpoint (sort_files function)
+    (gdb) step
