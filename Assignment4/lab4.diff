@@ -1,5 +1,10 @@
---- coreutils-with-bug/lib/timespec.h	2019-02-06 00:11:36.684731000 -0800
-+++ timespec.h	2019-02-06 00:23:00.649676000 -0800
+2019-02-06  Brendon Tetsuo Ng  <classvwt@lnxsrv07.seas.ucla.edu>
+
+        * lib/timespec.h (timespec_cmp): Use comparison operators to prevent overflow
+        due to subtraction that occurred when dealing with files very long apart
+
+--- lib/timespec.h	2019-02-06 00:11:36.684731000 -0800
++++ lib/timespec.h	2019-02-06 00:23:00.649676000 -0800
 @@ -45,8 +45,12 @@
  static inline int
  timespec_cmp (struct timespec a, struct timespec b)
