@@ -2,67 +2,63 @@
 #include <stdlib.h>
 
 int frobcmp(char const * a, char const * b);
+int compare(const void *a, const void *b);
 void checkInputError(void);
 void checkOutputError(void);
 
 int main(void) {
-    char* curLine = (char *) malloc(sizeof(char));
     char** allLines = (char **) malloc(sizeof(char*));
     char cur = getchar();
     checkInputError();
+    if(cur == EOF){
+        return 0;
+    }
+    allLines[0] = (char*) malloc(sizeof(char));
     
     int iLetter = 0;
     int iLine = 0;
-    while(!feof(stdin)){
-        curLine[iLetter] = cur;
-        curLine = (char*) realloc(curLine, (iLetter+2) * sizeof(char));
-        if(curLine == NULL) {
-            free(curLine);
-            fprintf(stderr, "Error with memory allocation!");
-            exit(1);
-        }
-        iLetter++;
-        
+    while(cur != EOF){
         // If we just added a space byte
         if(cur == ' ') {
-            allLines[iLine] = curLine;
-            allLines = (char**) realloc(allLines, (iLine+2)*sizeof(char*));
+            allLines[iLine][iLetter] = ' ';
             if(allLines == NULL) {
                 free(allLines);
                 fprintf(stderr, "Error with memory allocation!");
                 exit(1);
             }
-            iLine++;
-            free(curLine);
-            curLine = (char*) malloc(sizeof(char));
-            iLetter = 0;
             
+            int breakAgain =0;
             do {
                 cur = getchar();
                 checkInputError();
-                if(feof(stdin))
+                if(cur == EOF){
+                    breakAgain = 1;
                     break;
+                }
             } while (cur == ' ');
-            continue;
+            
+            if(breakAgain)
+                break;
+            
+            iLine++;
+            allLines[iLine] = (char*) malloc(sizeof(char));
+            iLetter = 0;
         }
-        
-        cur = getchar();
-        checkInputError();
-        if(feof(stdin)){
-            curLine[iLetter] = ' ';
-            allLines[iLine] = curLine;
-            allLines = (char**) realloc(allLines, (iLine+2)*sizeof(char*));
+        else {
+            allLines[iLine][iLetter] = cur;
+            allLines[iLine] = (char*) realloc(allLines[iLine], (iLetter+2) * sizeof(char));
             if(allLines == NULL) {
                 free(allLines);
                 fprintf(stderr, "Error with memory allocation!");
                 exit(1);
             }
-            iLine++;
-            free(curLine);
-            curLine = (char*) malloc(sizeof(char));
-            iLetter = 0;
+            iLetter++;
+            cur = getchar();
+            if (cur == EOF) {
+                allLines[iLine][iLetter] = ' ';
+                break;
+            }
         }
-        
     }
     
     
@@ -73,7 +69,6 @@ int main(void) {
         }
         free(allLines[l]);
     }
-    free(curLine);
     free(allLines);
     return 0;
 }
@@ -90,6 +85,10 @@ int frobcmp(char const * a, char const * b) {
         return 1;
     else
         return -1;
+}
+
+int compare(const void *a, const void *b) {
+    return frobcmp(*(const char**) a, *(const char**) b);
 }
 
 
