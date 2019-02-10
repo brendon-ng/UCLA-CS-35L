@@ -22,6 +22,9 @@ int main(void) {
         if(cur == ' ') {
             allLines[iLine][iLetter] = ' ';
             if(allLines == NULL) {
+                for(int l=0; l<=iLine; l++){
+                    free(allLines[l]);
+                }
                 free(allLines);
                 fprintf(stderr, "Error with memory allocation!");
                 exit(1);
@@ -48,6 +51,9 @@ int main(void) {
             allLines[iLine][iLetter] = cur;
             allLines[iLine] = (char*) realloc(allLines[iLine], (iLetter+2) * sizeof(char));
             if(allLines == NULL) {
+                for(int l=0; l<=iLine; l++){
+                    free(allLines[l]);
+                }
                 free(allLines);
                 fprintf(stderr, "Error with memory allocation!");
                 exit(1);
@@ -61,10 +67,11 @@ int main(void) {
         }
     }
     
+    int (* func) (const void *, const void *) = &compare;
+    qsort(allLines[0], iLine+1, sizeof(char*), func);
     
-    
-    for(int l=0; l<iLine; l++){
-        for(int i=0; allLines[l][i]!=' ';i++){
+    for(int l=0; l<=iLine; l++){
+        for(int i=0; allLines[l][i]!='\0';i++){
             putchar(allLines[l][i]);
         }
         free(allLines[l]);
