@@ -43,7 +43,7 @@ int main(void) {
             if(breakAgain)
                 break;
             
-            allLines = (char**) realloc(allLines, (iLine+2)*sizeof(char*));
+            allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
             iLine++;
             allLines[iLine] = (char*) malloc(sizeof(char));
             iLetter = 0;
@@ -68,8 +68,8 @@ int main(void) {
         }
     }
     
-    int (* func) (const void *, const void *) = &compare;
-    qsort(allLines[0], iLine+1, sizeof(char*), func);
+//    int (* func) (const void *, const void *) = &compare;
+//    qsort(allLines[0], iLine+1, sizeof(char*), func);
     
     for(int l=0; l<=iLine; l++){
         for(int i=0; allLines[l][i]!='\0';i++){
