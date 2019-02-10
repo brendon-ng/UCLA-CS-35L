@@ -43,6 +43,7 @@ int main(void) {
             if(breakAgain)
                 break;
             
+            allLines = (char**) realloc(allLines, (iLine+2)*sizeof(char*));
             iLine++;
             allLines[iLine] = (char*) malloc(sizeof(char));
             iLetter = 0;
