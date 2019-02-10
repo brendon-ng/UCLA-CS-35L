@@ -67,9 +67,12 @@ int main(void) {
     
     
     
-    
-    printf("%s", curLine);
-    
+    for(int l=0; l<iLine; l++){
+        for(int i=0; allLines[l][i]!=' ';i++){
+            putchar(allLines[l][i]);
+        }
+        free(allLines[l]);
+    }
     free(curLine);
     free(allLines);
     return 0;
