@@ -47,15 +47,16 @@ int main(int argc, char* argv[]) {
   // getchar and putchar, change if necessary for every character in stdin 
   char* cur = (char *) malloc(sizeof(char));
   while(1){
-    ssize_t numRead = read(0, cur, 1);
-    if(numRead < 0){
+    ssize_t numRead = read(0, cur, 1);  // read in character
+    if(numRead < 0){	// Check for error
       char* msg = "Error reading input.\n";
       write(2, msg, strlen(msg));
       exit(1);
     }
-    if (numRead == 0)
+    if (numRead == 0)	// If its zero, its the end of the file
       break;
-    
+	  
+    // Look for match
     int index = -1;
     for(int i=0; i<lengthFrom; i++){
       if(*cur == from[i]){
@@ -72,7 +73,7 @@ int main(int argc, char* argv[]) {
       written = write(1, &toWrite, 1);
     }
     
-    if(written <= 0){
+    if(written <= 0){	// Check for output error
       char* msg = "Error writing output.\n";
       write(2, msg, strlen(msg));
       exit(1);
