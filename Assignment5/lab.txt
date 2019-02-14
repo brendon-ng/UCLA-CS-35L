@@ -14,4 +14,3 @@ Laboratory: Buffered versus unbuffered I/O
    character or	the translated one.
 
 2. Write tr2u.c
-   
