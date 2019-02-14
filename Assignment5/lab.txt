@@ -1,0 +1,17 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 5: System Call Programming and Debugging
+
+Laboratory: Buffered versus unbuffered I/O
+
+1. Write tr2b.c
+   Used	a loop that used getchar() each	iteration until	the end	of file.
+   Checked each	individual char	after getchar to see if	it was in 'from'
+   operand and then used putchar() each	iteration to print the original	
+   character or	the translated one.
+
+2. Write tr2u.c
+   
