@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  // getchar and putchar, change if necessary for every character in stdin
   char cur = getchar();
   checkForIOError();
   while(cur != EOF){
