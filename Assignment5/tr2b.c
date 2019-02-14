@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 
 void checkForIOError(){
   if (ferror(stdin) != 0) {
-    fprintf(stderr, "Error with I/O!");
+    fprintf(stderr, "Error with I/O!\n");
     exit(1);
   }
 }
