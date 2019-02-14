@@ -16,3 +16,8 @@ Assignment4/coreutils*
 ChangeLog
 Assignment4/*.orig
 Assignment4/sfrob
+Assignment5/tr2b
+Assignment5/tr2u
+Assignment5/bufferedOutput.txt
+Assignment5/unbufferedOutput.txt
+Assignment5/bigfile.txt

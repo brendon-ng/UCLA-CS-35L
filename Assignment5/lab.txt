@@ -14,3 +14,152 @@ Laboratory: Buffered versus unbuffered I/O
    character or	the translated one.
 
 2. Write tr2u.c
+   Does the same thing as tr2b.c but using read() and write().
+
+3. Compare System Calls:
+   
+   $ dd if=/dev/urandom of=bigfile.txt bs=1M count=5
+   Create a very large file of random bytes for testing. This file contains 5
+   million bytes.
+
+   $ strace -c ./tr2b abcd123 ZYXW098 < bigfile.txt > bufferedOutput.txt
+   Run the strace command with option -c to compare the number of system calls
+   when copying a file and redirecting it to a new one.
+   Result:
+   % time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 69.32    0.000427           1       640           write
+ 30.68    0.000189           0       642           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           fstat
+  0.00    0.000000           0         9           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000616                  1308         1 total
+
+   SYSTEM CALLS FOR BUFFERED, COPYING FILE: 1308
+
+
+
+   $ strace -c ./tr2u abcd123 ZYXW098 < bigfile.txt > unbufferedOutput.txt
+   Use strace to see how many system calls were made for the unbuffered version
+   that redirects and copies output to a new file.
+   Result:
+   % time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 54.88   21.246561           4   5242880           write
+ 45.12   17.469437           3   5242882           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         2           fstat
+  0.00    0.000000           0         7           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         4           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   38.715998              10485787         1 total
+
+   SYSTEM CALLS FOR UNBUFFERED, COPYING FILE: 10485787
+
+   We see that the buffered version uses way less system calls than the
+   unbuffered version when copying one file to another.
+
+
+
+   $ strace -c ./tr2b abcd123 ZYXW098 < bigfile.txt
+   Use strace to see how many system calls were made for the buffered version
+   printing to terminal.
+   Result:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 96.38    0.056088           3     20800           write
+  2.97    0.001730           3       642           read
+  0.20    0.000114          13         9           mmap
+  0.13    0.000073          73         1           execve
+  0.10    0.000059          59         1           brk
+  0.07    0.000039          20         2           open
+  0.04    0.000026           7         4           mprotect
+  0.04    0.000023           6         4           fstat
+  0.03    0.000020          20         1         1 access
+  0.02    0.000010          10         1           munmap
+  0.01    0.000008           4         2           close
+  0.01    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.058193                 21468         1 total
+
+SYSTEM CALLS FOR BUFFERED, COPYING TO TERMINAL: 21468
+
+
+
+   $ strace -c ./tr2u abcd123 ZYXW098 < bigfile.txt
+   Result:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.23   22.460999           4   5242880           write
+ 44.77   18.207581           3   5242882           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         2           fstat
+  0.00    0.000000           0         7           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         4           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   40.668580              10485787         1 total
+
+
+   SYSTEM CALLS FOR UNBUFFERED, COPYING TO TERMINAL: 10485787
+
+   We see again taht the buffered version uses way less system calls than the
+   unbuffered version when copying the file to terminal as well.
+   We also see that the unbuffered version uses the same amount of system calls
+   whether its copying one file to another or copying to terminal. The buffered
+   version uses way more system calls to copy to terminal than to another file.
+
+4. Use time command to measure how fast each program is
+   $ time ./tr2b abcd123 ZYXW098 < bigfile.txt > bufferedOutput.txt
+   Measure speed of buffered version copying one file to another.
+Result:
+real	0m0.400s
+user	0m0.308s
+sys	0m0.009s
+   
+
+   $ time ./tr2u abcd123 ZYXW098 < bigfile.txt > unbufferedOutput.txt
+   Measure speed of unbuffered version copying one file to another.
+Result:
+real	0m11.036s
+user	0m1.408s
+sys	0m9.536s
+
+
+   $ time ./tr2b abcd123 ZYXW098 < bigfile.txt
+   Measure speed of buffered version copying to terminal.
+Result:
+real	0m3.998s
+user	0m0.368s
+sys	0m0.101s
+
+
+   $ time ./tr2u abcd123 ZYXW098 < bigfile.txt
+Result:
+real	0m9.970s
+user	0m1.455s
+sys	0m8.504s
+
+
+   We find that the buffered version is still much faster than the unbuffered
+   version because it uses much less system calls. The amount of system calls
+   is proportional to the amount of time it takes to run.
