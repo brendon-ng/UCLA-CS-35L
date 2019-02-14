@@ -69,8 +69,7 @@ int main(int argc, char* argv[]) {
     if(index == -1)
       written = write(1, cur, 1);
     else{
-      char toWrite = to[index];
-      written = write(1, &toWrite, 1);
+      written = write(1, &to[index], 1);
     }
     
     if(written <= 0){	// Check for output error

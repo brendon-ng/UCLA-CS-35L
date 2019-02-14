@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
   }
 
   // getchar and putchar, change if necessary for every character in stdin
-  char cur = getchar();
+  int cur = getchar();
   checkForIOError();
   while(cur != EOF){
     int index = -1;
