@@ -87,6 +87,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  
   //Byte by byte read input (for non normal files AND if file grew)
   char* cur = (char*) malloc(sizeof(char));
   status = read(0, cur, 1);
@@ -105,8 +106,8 @@ int main(int argc, char* argv[]) {
     if(*cur == ' ') {
       curLine[iLetter] = *cur;
       curLine = realloc(curLine, (iLetter + 2) * sizeof(char));
-      allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
       allLines[iLine] = curLine;
+      allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
       iLine++;
       if(curLine == NULL || allLines == NULL) {
         for(int l=0; l<=iLine; l++){
@@ -157,9 +158,10 @@ int main(int argc, char* argv[]) {
       checkForSystemCallError(status);
       if(feof(stdin) || status == 0){
 	curLine[iLetter] = ' '; 
+	allLines[iLine] = curLine;
 	allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
-        allLines[iLine] = curLine;
-	if(allLines == NULL) {
+	iLine++;
+      	if(allLines == NULL) {
           for(int l=0; l<=iLine; l++){
             free(allLines[l]);
           }
