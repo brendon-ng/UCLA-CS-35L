@@ -8,12 +8,11 @@
 int frobcmp(char const * a, char const * b);
 int compare(const void *a, const void *b);
 void checkForSystemCallError(int status);
-void checkInputError(void);
-void checkOutputError(void);
 
-int main(void) {
-  int f = 0;
-  int regularFile = 0;
+int f = 0;
+
+int main(int argc, char* argv[]) {
+  // Check for -f flag and argument errors
   if (argc == 2){
     if(strcmp(argv[1], "-f") == 0)
       f = 1;
@@ -41,17 +40,19 @@ int main(void) {
 
   //If it is a regular file
   if(S_ISREG(buffer.st_mode)){
-    line = (char*) malloc(sizeof(char) * fileSize);
-    status = read(0, line, buffer.st_size+1);
+    //allocate enough memory
+    line = (char*) malloc(sizeof(char) * fileSize+1);
+
+    //read the whole file
+    status = read(0, line, buffer.st_size);
     checkForSystemCallError(status);
 
+    //Count how many lines, divided by spaces
     int lines = 0;
     for(size_t i=0; i < fileSize; i++) {
-      if(i==0 && line[0] != ' ')
-	lines++;
-
       if(line[i] == ' ') {
-	lines++;
+	if(i != 0)
+	  lines++;
 	while(i<fileSize-1 && line[i+1] == ' ')
 	  i++;
       }
@@ -65,114 +66,157 @@ int main(void) {
 	}
 	line[fileSize] = ' ';
 	fileSize++;
+	lines++;
 	break;
       }
     }
 
+    //Allocate memory for array of lines
     allLines = (char**) malloc(lines * sizeof(char*));
 
+    //Add new line to allLines when there is a space
     int addedLine = 0;
     for(size_t i=0; i<fileSize; i++){
       if(!addedLine && line[i] != ' ') {
 	allLines[iLine] = &line[i];
 	iLine++;
-	addLine = 1;
+	addedLine = 1;
       }
       else if (addedLine && line[i] == ' ')
 	addedLine = 0;
     }
   }
 
+  //Byte by byte read input (for non normal files AND if file grew)
+  char* cur = (char*) malloc(sizeof(char));
+  status = read(0, cur, 1);
+  checkForSystemCallError(status);
+  if(status != 0){
+    while(status != 0 && *cur == ' '){
+      status = read(0, cur, 1);
+      checkForSystemCallError(status);
+    }
+  }
+   
+  char* curLine = (char *) malloc(sizeof(char));
+  int iLetter = 0;
+  while(!feof(stdin) && status > 0){
+    // If we just added a space byte
+    if(*cur == ' ') {
+      curLine[iLetter] = *cur;
+      curLine = realloc(curLine, (iLetter + 2) * sizeof(char));
+      allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
+      allLines[iLine] = curLine;
+      iLine++;
+      if(curLine == NULL || allLines == NULL) {
+        for(int l=0; l<=iLine; l++){
+          free(allLines[l]);
+        }
+        free(allLines);
+	free(curLine);
+        char* msg = "sfrobu.c: error with memory allocation\n";
+        write(2, msg, strlen(msg));
+        exit(1);
+      }
+
+
+      
+      int breakAgain =0;
+      do {
+        status = read(0, cur, 1);
+        checkForSystemCallError(status);
+        if(feof(stdin) || status == 0){
+          breakAgain = 1;
+          break;
+        }
+      } while (*cur == ' ');
+            
+      if(breakAgain)
+        break;
+            
   
-    char cur = getchar();
-    checkInputError();
-    if(cur == EOF){
-        return 0;
+      iLetter = 0;
+      free(curLine);
+      curLine = (char*) malloc(sizeof(char));
     }
-    allLines[0] = (char*) malloc(sizeof(char));
-    
-    int iLetter = 0;
-    int iLine = 0;
-    while(cur != EOF){
-        // If we just added a space byte
-        if(cur == ' ') {
-            allLines[iLine][iLetter] = ' ';
-            if(allLines == NULL) {
-                for(int l=0; l<=iLine; l++){
-                    free(allLines[l]);
-                }
-                free(allLines);
-                fprintf(stderr, "Error with memory allocation!");
-                exit(1);
-            }
-            
-            int breakAgain =0;
-            do {
-                cur = getchar();
-                checkInputError();
-                if(cur == EOF){
-                    breakAgain = 1;
-                    break;
-                }
-            } while (cur == ' ');
-            
-            if(breakAgain)
-                break;
-            
-            allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
-            iLine++;
-            allLines[iLine] = (char*) malloc(sizeof(char));
-            iLetter = 0;
+    else {
+      curLine[iLetter] = *cur;
+      curLine = realloc(curLine, (iLetter + 2) * sizeof(char));
+      if(curLine == NULL) {
+        for(int l=0; l<=iLine; l++){
+          free(allLines[l]);
         }
-        else {
-            allLines[iLine][iLetter] = cur;
-            allLines[iLine] = (char*) realloc(allLines[iLine], (iLetter+2) * sizeof(char));
-            if(allLines == NULL) {
-                for(int l=0; l<=iLine; l++){
-                    free(allLines[l]);
-                }
-                free(allLines);
-                fprintf(stderr, "Error with memory allocation!");
-                exit(1);
-            }
-            iLetter++;
-            cur = getchar();
-            if (cur == EOF) {
-                allLines[iLine][iLetter] = ' ';
-                break;
-            }
-        }
+        free(allLines);
+	free(curLine);
+        char* msg = "sfrobu.c: error with memory allocation\n";
+        write(2, msg, strlen(msg));
+        exit(1);
+      }
+      iLetter++;
+      status = read(0, cur, 1);
+      checkForSystemCallError(status);
+      if(feof(stdin) || status == 0){
+	curLine[iLetter] = ' '; 
+        break;
+      }
     }
-    
-    int (* func) (const void *, const void *) = &compare;
-    qsort(allLines, iLine+1, sizeof(char*), func);
-    
-    for(int l=0; l<=iLine; l++){
-        for(int i=0; allLines[l][i]!='\0';i++){
-            putchar(allLines[l][i]);
-        }
-        free(allLines[l]);
+  }
+  
+  
+  int (* func) (const void *, const void *) = &compare;
+  qsort(allLines, iLine, sizeof(char*), func);
+
+  
+  for(size_t l=0; l<iLine; l++){
+    size_t i;
+    for(i=0; i!=strlen(allLines[l]); i++){
+      if(allLines[l][i] == ' '){
+	i++;
+	break;
+      }
     }
-    free(allLines);
-    return 0;
+    status = write(1, allLines[l], i);
+    checkForSystemCallError(status);
+  }
+  free(allLines); 
+  return 0;
 }
 
 
 int frobcmp(char const * a, char const * b) {
+  if(!f) {
     while (*a == *b){
-        if (*a == ' ')
-            return 0;
-        a++;
-        b++;
+      if (*a == ' ')
+        return 0;
+      a++;
+      b++;
     }
     if ( (*a ^ 42) > (*b ^ 42) )
-        return 1;
+      return 1;
     else
-        return -1;
+      return -1;
+  }
+  else {
+     while(*a != ' ' || *b != ' '){
+      if (*a == ' ')
+	return -1;
+      if (*b == ' ')
+	return 1;
+      char fa = toupper((unsigned char) (*a ^ 42));
+      char fb =	toupper((unsigned char) (*b ^ 42));
+      if(fa < fb)
+	return -1;
+      if(fb < fa)
+	return 1;
+      a++;
+      b++;
+    }
+    return 0;
+  }
 }
 
 int compare(const void *a, const void *b) {
-    return frobcmp(*(const char**) a, *(const char**) b);
+  return frobcmp(*(const char**) a, *(const char**) b);
 }
 
 
