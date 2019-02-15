@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Allocate memory for array of lines
-    allLines = (char**) realloc(allLines,(lines * sizeof(char*)));
+    allLines = (char**) realloc(allLines,((lines+1) * sizeof(char*)));
 
     //Add new line to allLines when there is a space
     int addedLine = 0;
