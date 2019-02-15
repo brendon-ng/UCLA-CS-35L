@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
   size_t fileSize = buffer.st_size;
 
-  char** allLines;
+  char** allLines = (char**) malloc(sizeof(char*));
   char* line;
   int iLine = 0;
 
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Allocate memory for array of lines
-    allLines = (char**) malloc(lines * sizeof(char*));
+    allLines = (char**) realloc(allLines,(lines * sizeof(char*)));
 
     //Add new line to allLines when there is a space
     int addedLine = 0;
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
             
   
       iLetter = 0;
-      free(curLine);
+      curLine = NULL;
       curLine = (char*) malloc(sizeof(char));
     }
     else {
@@ -157,7 +157,19 @@ int main(int argc, char* argv[]) {
       checkForSystemCallError(status);
       if(feof(stdin) || status == 0){
 	curLine[iLetter] = ' '; 
-        break;
+	allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
+        allLines[iLine] = curLine;
+	if(allLines == NULL) {
+          for(int l=0; l<=iLine; l++){
+            free(allLines[l]);
+          }
+          free(allLines);
+          free(curLine);
+          char* msg = "sfrobu.c: error with memory allocation\n";
+          write(2, msg, strlen(msg));
+          exit(1);
+        }
+	break;
       }
     }
   }
