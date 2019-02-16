@@ -201,9 +201,9 @@ sys   | 0m0.160s | 0m0.841s | 0m0.095s  | 0m0.912s  | 0m0.085s  |
 
 1,000,000 Lines:
       | sfrob    | sfrobu   |  sfrobs   | sfrobu -f | sfrobs -f |
-real  | 0m15.261s| 0m1.109s | 0m9.923s  | 0m1.074s  | 0m11.024s |
-user  | 0m3.546s | 0m1.039s | 0m1.779s  | 0m0.006s  | 0m2.698s  |
-sys   | 0m1.647s | 0m0.068s | 0m0.823s  | 0m0.066s  | 0m0.862s  |
+real  | 0m15.261s| took too | 0m9.923s  | took too  | 0m11.024s |
+user  | 0m3.546s | long to  | 0m1.779s  | long to   | 0m2.698s  |
+sys   | 0m1.647s | run      | 0m0.823s  | run       | 0m0.862s  |
 
 
 From these results we see that the fastest version is sfrobs followed by sfrobu
@@ -215,12 +215,18 @@ conclude that buffered I/O is faster than unbuffered I/O.
 
 
 
-2. Compare the number of comparisons by tracking the amount of times frobcmp()
+2. Estimate the number of comparisons by tracking the amount of times frobcmp()
    is called by adding a global variable to sfrob, sfrobu, and sfrobs.
 
 Number of Comparisons:
-num lines | sfrob  | sfrobu | sfrobs | sfrobu -f | sfrobs -f |
-1000      |
-10,000    |
-100,000   |
-1,000,000 |
+(number of comparisons the same for sfrob and sfrobu)
+num lines | comps  | 
+1000      | 51637  |
+10,000    | 664293 |
+100,000   | 8140516|
+1,000,000 |96440064|
+
+Graphing this data and running a series of regressions, the best fitting
+function for comparisons as a function of input lines is a linear function of
+
+comparisons = (96.95) * (num lines) - 604632
