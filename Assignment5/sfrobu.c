@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     if(strcmp(argv[1], "-f") == 0)
       f = 1;
     else {
-      char* msg = "sfrobu.c: invalid option!";
+      char* msg = "sfrobu.c: invalid option!\n";
       write(2, msg, strlen(msg));
       exit(1);
     }
