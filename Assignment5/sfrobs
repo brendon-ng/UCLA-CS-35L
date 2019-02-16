@@ -71,11 +71,11 @@ frob="\52\53\50\51\56\57\54\55\
 \322\323\320\321\326\327\324\325"
 
 
-if [ $# -eq 0 ]
+if(( $# == 0 ))
 then
 	tr $frob $unfrob | sort | tr $unfrob $frob
 	exit 0
-elif [ $# -eq 1 ]
+elif (( $# == 1 ))
 then
     if [ $1 == '-f' ]
     then

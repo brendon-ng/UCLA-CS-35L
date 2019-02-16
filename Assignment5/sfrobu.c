@@ -92,13 +92,16 @@ int main(int argc, char* argv[]) {
   char* cur = (char*) malloc(sizeof(char));
   status = read(0, cur, 1);
   checkForSystemCallError(status);
+
+  // Ignore leading spaces
   if(status != 0){
     while(status != 0 && *cur == ' '){
       status = read(0, cur, 1);
       checkForSystemCallError(status);
     }
   }
-   
+
+  // Read in char by char
   char* curLine = (char *) malloc(sizeof(char));
   int iLetter = 0;
   while(!feof(stdin) && status > 0){
@@ -109,7 +112,7 @@ int main(int argc, char* argv[]) {
       allLines[iLine] = curLine;
       allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
       iLine++;
-      if(curLine == NULL || allLines == NULL) {
+      if(curLine == NULL || allLines == NULL) { // check for memory error
         for(int l=0; l<=iLine; l++){
           free(allLines[l]);
         }
@@ -120,8 +123,7 @@ int main(int argc, char* argv[]) {
         exit(1);
       }
 
-
-      
+      // Handle multiple spaces
       int breakAgain =0;
       do {
         status = read(0, cur, 1);
@@ -134,16 +136,16 @@ int main(int argc, char* argv[]) {
             
       if(breakAgain)
         break;
-            
   
       iLetter = 0;
       curLine = NULL;
       curLine = (char*) malloc(sizeof(char));
     }
     else {
+      // Regular characters
       curLine[iLetter] = *cur;
       curLine = realloc(curLine, (iLetter + 2) * sizeof(char));
-      if(curLine == NULL) {
+      if(curLine == NULL) {   // Check for memory error
         for(int l=0; l<=iLine; l++){
           free(allLines[l]);
         }
@@ -156,12 +158,12 @@ int main(int argc, char* argv[]) {
       iLetter++;
       status = read(0, cur, 1);
       checkForSystemCallError(status);
-      if(feof(stdin) || status == 0){
+      if(feof(stdin) || status == 0){ // check for end of file
 	curLine[iLetter] = ' '; 
 	allLines[iLine] = curLine;
 	allLines = (char**) realloc(allLines, (iLine+2) * sizeof(char*));
 	iLine++;
-      	if(allLines == NULL) {
+      	if(allLines == NULL) {  // check for memory error
           for(int l=0; l<=iLine; l++){
             free(allLines[l]);
           }
@@ -176,7 +178,7 @@ int main(int argc, char* argv[]) {
     }
   }
   
-  
+  // sort and print
   int (* func) (const void *, const void *) = &compare;
   qsort(allLines, iLine, sizeof(char*), func);
 
@@ -192,7 +194,9 @@ int main(int argc, char* argv[]) {
     status = write(1, allLines[l], i);
     checkForSystemCallError(status);
   }
-  free(allLines); 
+  free(allLines);
+  free(curLine);
+  free(cur);
   return 0;
 }
 
