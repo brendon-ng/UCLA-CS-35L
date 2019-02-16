@@ -1,10 +1,9 @@
-#! /bin/bash
-# sfrobs --- sorts frobnicated input alphabetically based on unfrobnicated form
-# if there is a -f option passed, case is ignored during sorting
+#!/bin/bash
 
+#use the C locale
 export LC_ALL='C'
 
-unfrob="\0\1\2\3\4\5\6\7\
+normal="\0\1\2\3\4\5\6\7\
 \10\11\12\13\14\15\16\17\
 \20\21\22\23\24\25\26\27\
 \30\31\32\33\34\35\36\37\
@@ -37,7 +36,7 @@ unfrob="\0\1\2\3\4\5\6\7\
 \360\361\362\363\364\365\366\367\
 \370\371\372\373\374\375\376\377"
 
-frob="\52\53\50\51\56\57\54\55\
+frobnicated="\52\53\50\51\56\57\54\55\
 \42\43\40\41\46\47\44\45\
 \72\73\70\71\76\77\74\75\
 \62\63\60\61\66\67\64\65\
@@ -70,23 +69,19 @@ frob="\52\53\50\51\56\57\54\55\
 \332\333\330\331\336\337\334\335\
 \322\323\320\321\326\327\324\325"
 
+numArgs=$#
 
-if [ $# -eq 0 ]
+if [ $numArgs -eq 0 ]
 then
-	tr $frob $unfrob | sort | tr $unfrob $frob
-	exit 0
-elif [ $# -eq 1 ]
+	tr $normal $frobnicated | sort | tr $frobnicated $normal
+elif [ $numArgs -eq 1 ]
 then
-    if [ $1 == '-f' ]
-    then
-	tr $frob $unfrob | sort -f | tr $unfrob $frob
-	exit 0
-    else
-	echo "sfrobs: invalid operand: '$1'"
-	exit 1
-    fi
+	if [ $1 = '-f' ]	
+	then
+		tr $normal $frobnicated | sort -f | tr $frobnicated $normal
+	else
+		echo "Error: Invalid Parameter Passed: '$1'"
+	fi
 else
-	echo "sfrobs: extra operand: '$2'"
-	exit 1
+	echo "Error: Too many arguments"
 fi
-
