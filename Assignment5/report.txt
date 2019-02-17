@@ -200,10 +200,10 @@ user  | 0m0.306s | 2m15.029s| 0m0.146s  | 2m14.635s | 0m0.231s  |
 sys   | 0m0.160s | 0m0.841s | 0m0.095s  | 0m0.912s  | 0m0.085s  |
 
 1,000,000 Lines:
-      | sfrob    | sfrobu   |  sfrobs   | sfrobu -f | sfrobs -f |
-real  | 0m15.261s| took too | 0m9.923s  | took too  | 0m11.024s |
-user  | 0m3.546s | long to  | 0m1.779s  | long to   | 0m2.698s  |
-sys   | 0m1.647s | run      | 0m0.823s  | run       | 0m0.862s  |
+      | sfrob    | sfrobu     |  sfrobs   | sfrobu -f | sfrobs -f   |
+real  | 0m15.261s| 266m1.893s | 0m9.923s  | took too  | 276m52.660s |
+user  | 0m3.546s | 265m16.626s| 0m1.779s  | long to   | 275m56.898s |
+sys   | 0m1.647s | 0m31.412s  | 0m0.823s  | run       | 0m38.884s   |
 
 
 From these results we see that the fastest version is sfrobs followed by sfrobu
