@@ -1,0 +1,70 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 6: Multithreaded Performance
+
+Laboratory:
+
+1. $ echo $PATH
+   Check if /usr/local/cs/bin is prepended to our PATH environment variable.
+   We find that it is.
+
+2. $ sort --version
+   Ensure the version we have of "sort" is sufficient for this lab
+   We see that we have version 8.3 of GNU coreutils so it is sufficient.
+
+3. $ cat /dev/urandom | od -An -t fF -N $((2**24)) | tr -s "[:blank:]" "\n" |
+     	 sed '/^$/d' > rand.txt
+   Generate 2^24 random floating point numbers and put them one on each line,
+   removing all blank space and empty lines and stores it in rand.txt
+   Using /dev/urandom which is a random number generator and piping it to the
+   od command which writes the input in floating point format which we specify
+   with the -t fF flag. The -N option lets us specify how many bytes we want at
+   2^24. The -An flag removes addresses.
+   The tr command uses the -s flag and regex to take any string of whitespace
+   and replace it with a new line. the sed function will remove any blank lines
+
+4. $ time -p sort -g rand.txt > /dev/null
+   Time the "sort -g" command with our random data and store it in /dev/null
+   Results:
+   real 8.67
+   user 45.05
+   sys 0.30
+
+   Time sort -g command with the --parallel option with 1, 2, 4, and 8 threads.
+
+   $ time -p sort -g --parallel=1 rand.txt > /dev/null
+   1 thread
+   Results:
+   real 41.44
+   user 41.11
+   sys 0.33
+
+   $ time -p sort -g --parallel=2 rand.txt > /dev/null
+   2 threads
+   Results:
+   real 22.24
+   user 42.22
+   sys 0.15
+
+   $ time -p sort -g --parallel=4 rand.txt > /dev/null
+   4 threads
+   Results:
+   real 13.49
+   user 44.94
+   sys 0.39
+
+   $ time -p sort -g --parallel=8 rand.txt > /dev/null
+   8 threads
+   Results:
+   real 9.04
+   user 45.82
+   sys 0.50
+
+   As we increase the number of threads, the real time decreases and approaches
+   our baseline value for the time of sort -g without the --parallel option.
+   This tells us that without the --parallel option, this version of sort -g
+   uses multiple threads. We can conclude that multithreading speeds up this
+   process.
