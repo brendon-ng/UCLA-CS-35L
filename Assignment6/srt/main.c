@@ -186,7 +186,7 @@ void *process(void *thread_num){
 
   /* for every pixel */
   // multiple threads
-  int num = *(*int) thread_num;
+  int num = *(int*) thread_num;
   for( int px=num; px<width; px+=nthreads )
   {
     const double x = pixel_dx * ((double)( px-(width/2) ));
