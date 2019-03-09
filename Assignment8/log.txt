@@ -1,0 +1,59 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 8: SSH setup and use in applications
+
+Laboratory:
+
+Set Up Beaglebone:
+
+1. Plug in Beaglebone
+2. Open START.htm page from Beaglebone directory on my laptop
+3. Installed the two drivers including 9.2 HoRNDIS because I am running a
+   recent version of Mac OS. Then ran
+   $ sudo rm -rf /System/Library/Extensions/HoRNDIS.kext
+   and restarted my computer.
+
+4. Then I SSH'ed into by BeagleBone:
+   $ sudo ssh debian@192.168.6.2
+   Since I have a very new BeagleBone, the password was not blank for root so I
+   logged into Debian instead with the password "temppwd"
+
+5. Connected it to wifi - used a personal wifi hotspot for this step.
+   In the BeagleBone:
+   $ sudo connmanctl
+   connmanctl> enable wifi
+   connmanctl> scan wifi
+   connmanctl> services
+   I then found the iPhone wifi hotspot and copied the access point.
+   connmanctl> agent on
+   connmanctl> connect
+   Entered the password, was then connected successfully to wifi
+   connmanctl> quit
+
+6. Checked to find the IP address of my BeagleBone:
+   $ ifconfig
+   It outputted a lot of information but under the network interface "wlan0",
+   there was a label "inet" with my IP address next to it.
+   IP address: 172.20.10.2
+
+7. Updated the database of apt-get:
+   $ sudo apt-get update
+   Installed xauth and xvfb for X11 forwarding support:
+   $ sudo apt-get install xauth
+   $ sudo apt-get install xvfb
+
+8. Enable X11 forwarding
+   $ sudo vim /etc/ssh/ssh_config
+   Then I changed "ForwardX11 no" and "ForwardAgent no" to "ForwardX11 yes" and
+   "ForwardAgent yes".
+   $ sudo vim /etc/ssh/sshd_config
+   Checked to make sure forwarding was on and it was.
+
+   I already had XQuartz on my Mac so I did not have to do anyting for that.
+
+9. Installed firefox:
+   $ sudo apt-get install firefox-esr-l10n-en-gb
+
