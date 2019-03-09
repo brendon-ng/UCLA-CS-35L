@@ -57,3 +57,100 @@ Set Up Beaglebone:
 9. Installed firefox:
    $ sudo apt-get install firefox-esr-l10n-en-gb
 
+10. With my partner, I acted as the server so I installed the server version of
+    OpenSSH.
+    $ sudo apt-get install openssh-server
+
+I am the server and my parter, Jivan Gubbi (604-929-653), is the client.
+
+1. $ ssh-keygen
+   To generate public and private rsa key pairs. We save it into the default
+   location of /home/debian/.ssh/id_rsa.
+   it prompted me to the following
+
+   Generating public/private rsa key pair.
+   Enter file in which to save the key (/home/debian/.ssh/id_rsa):
+
+   I pressed enter to install into the default location and it prompted me to
+   enter a passphrase.
+
+   Created directory '/home/debian/.ssh'.
+   Enter passphrase (empty for no passphrase):
+
+   I entered my favorite Beatles song as a passphrase: "obladioblada"
+
+   The key fingerprint is:
+   SHA256:GSjaDDNaR53G2/cSho/b2m7w6KmTHdYvYqgltc3InQs debian@beaglebone
+   The key's randomart image is:
+   +---[RSA 2048]----+
+   |    .o .         |
+   |   .  =.         |
+   |  = o..o..       |
+   | o O .. oo+      |
+   |. . o . S* o     |
+   |     o *=.+ .    |
+   |    . E==B o     |
+   |     o+.*+= .    |
+   |    ...===o.     |
+   +----[SHA256]-----+
+
+2. Added an account for my client, jivan, on my server
+   $ sudo useradd -d /home/jivan -m jivan
+   Set the password to "jcg" - jivan's initials
+   $ sudo passwd jivan
+   Enter new UNIX password: "jcg" - ENTER
+
+3. cd into Jivan's home directory and create a .ssh folder.
+   $ cd /home/jivan
+   $ sudo mkdir .ssh
+     We use sudo here because we do not have permission initially to create a
+     ".ssh" directory.
+
+4. Change ownership and permissions on the new directory to make Jivan the
+   owner.
+
+   $ sudo chown -R jivan .ssh
+   $ sudo chmod 700 .ssh
+
+5. Jivan then went through all the client steps and successfully ssh'ed into my
+   server and succesfully ran commands using my IP address that I gave him.
+
+
+We then switched roles: I am now the client.
+
+ssh-keygen already done.
+
+1. copy my public key to the server. I used my account name @ Jivan's IP addr.
+   $ ssh-copy-id -i brendon@172.20.10.3
+   The normal message poped up about the ECDSA key fingerprint that comes up
+   the first time you ssh into a server. I typed "yes" to continue connecting.
+
+   It prompted me for my password on Jivan's server:
+   I entered my password: "bng" - ENTER
+
+2. $ eval `ssh-agent -s`
+   Agent pid 2789
+
+   $ ssh-add
+
+   Add the private key to ssh-agent so we don't have to put in a password each
+   time.
+
+   It prompted me for the passphrase: I entered the passphrase we decided on:
+   "obladioblada" - ENTER
+   Identity was successfully added.
+
+3. Then I ssh'ed into Jivan's server using both the -X and -Y options.
+   $ ssh -X brendon@172.20.10.3
+   $ ssh -Y brendon@172.20.10.3
+
+   Both versions let me ssh into his server, but the -X option enables X11
+   forwarding. It allows ability to bypass file permissions on the remote host.
+   The -Y enables trusted X11 forwarding which are not subjected to the X11
+   secruity extension controls. It is less secure.
+
+4. Ran commands and ensured they worked on the local host
+
+   $ xterm
+   $ gedit
+   $ firefox
