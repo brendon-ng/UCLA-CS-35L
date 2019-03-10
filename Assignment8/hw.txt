@@ -1,0 +1,44 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 8: SSH setup and use in applications
+
+Homework:
+
+1. Suppose the other teams really had been observing all the bytes going across the network. 
+Is your resulting network still secure? If so, explain why, and explain whether your answer 
+would change if (1) you assumed the other teams had also tapped your keyboards after you completed 
+all client-server setup and had thereby obtained your team's keystrokes during later operation, or 
+(2) you are booting off USB and you assume the other teams temporarily had physical control of the USB. 
+If not, explain any weaknesses of your team's setups, focusing on possible attacks by such outside observers.
+
+   Ans:
+   Our network would stil be secure because we encrypted all messages with the
+   public keys, but the correct private key is needed to decrypt it and the
+   other teams would not have the right private keys because it is on our
+   computers.
+
+   (1) If the other teams had also tapped our keyboards, it would no longer be
+   secure as they would have access to our private keys. They would know our
+   passphrase which would allow them to obtain our private key info.
+
+   (2) If the other teams had physical control of the USB, they would be able
+   to access the .ssh file to directly gain access to the private key, thus
+   compromising our data and messages.
+
+
+2. Explain why the gpg2 --verify command in the following instructions doesn't really verify that you personally created the file in question.
+How would you go about fixing this problem?
+
+    Ans:
+    It doesn't verify that we personally created the file but it checks if the
+    file and the detached signature match. So someone could tamper with the
+    file which creates a different detached signature, so the command would
+    be useless and think it is from a different source.
+
+    To fix the problem, we need to post the public key on some third party
+    site to keep track of the origin of the key so we can verify to ensure the
+    receiver has the correct key.
+
