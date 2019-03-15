@@ -1,0 +1,77 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 9: Change management
+
+Homework: Verifying and publishing a backported change
+
+1. $ emacs hw9.txt
+   $ git clone https://git.savannah.gnu.org/git/diffutils.git diffutilshw
+   Clone repo again so we are working with a clean slate
+
+2. $ cd diffutils
+   $ git checkout v3.0 -b quote
+   Check out version 3.0 and create a new branch
+
+3. $ patch -p1 < ../quote-3.0-patch.txt
+   Install the changes into this branch
+
+4. Researched EMACS function  add-change-log-entry-other-window (C-x 4 a)
+
+5. $ emacs
+   C-x 4 a
+   Pasted the change entries into the changelog from git-log.txt
+   C-x C-s
+   C-x C-c
+
+6. $ git add .
+   $ git commit -F ChangeLog
+   Stage all changes and commit them to the new branch with the ChangeLog entry
+   as the commit message.
+
+7. $ git format-patch -1 --stdout > ../formatted-patch.txt
+   Generate a formatted patch.
+
+8. Partner: Jivan Gubbi
+   UID: 604929653
+
+   I got Jivan's formatted patch and named it jivan-formatted-patch.txt
+
+   $ git checkout v3.0 -b partner
+   $ git am < ../jivan-formatted-patch.txt
+   $ ./bootstrap
+   $ ./configure
+   $ make
+   $ make check
+
+   We apply my partner's patch and build, verifying that the patch works with
+   make check.
+
+   We check the commands and make sure there is no backtick:
+   $ ./src/diff . -
+   Outputs:
+   ./src/diff: cannot compare '-' to a directory
+
+   $ ./src/diff --help
+   Outputs no backticks
+
+9. $ make distdir
+   $ cd diffutils-3.0.1-e3a1
+   $ nano ChangeLog
+   Verify that the ChangeLog entry works
+   Jivan's CHangeLog entry was successfully on the top of the file
+
+10. $ exit
+    $ ssh -X classvwt@lnxsrv05.seas.ucla.edu
+    Log out and ssh back in using -X to enable X11 forwarding
+
+    $ cd ~eggert/src/gnu/emacs
+    $ gitk
+    An XQuartz window opens on my computer and we look for the newest merge
+    that is not newer tahn 1/25/15
+    The description is in gitk-description.txt
+    The merge I screenshotted was at 2015-01-25 12:19:27 by Joakim Verona
+    with the comment "Merge branch 'master' into xwidget"
+    

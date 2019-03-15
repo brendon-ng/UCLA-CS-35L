@@ -1,0 +1,829 @@
+Brendon Ng
+304-925-492
+UCLA CS 35L Lab 3
+TA Guangyu Zhou
+
+Assignment 9: Change management
+
+Laboratory: Managing a backported change
+
+1. $ git clone https://git.savannah.gnu.org/git/diffutils.git
+   Get a copy of the Diffutils repo
+
+2. $ cd diffutils
+   $ git log > git-log.txt
+   Get a log of changes to diffutil's master branch and piped it to the file
+   git-log.txt
+
+3. $ git tag > git-tags.txt
+   Get a list of tags and pipe it to the file git-tags.txt
+
+4. $ emacs git-log.txt
+   Open the text file of the git log and search for
+   "maint: quote 'like this' or "like this", not `like this'”
+   C-s "maint: qu"
+
+   Found that this commit was identified by
+   commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+
+   $ git format-patch -1 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f --stdout > quote-patch.txt
+   create patch from commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f into the
+   file quote-patch.txt
+
+5. $ git checkout v3.0
+   Check out version 3.0 using the tag found in git-tags.txt
+
+6. $ patch -p1 < quote-patch.txt
+   Apply patch from quote-patch.txt to version 3.0
+
+   A few times, it was not able to figure out what file to patch, so I pressed
+   ENTER to skip past those.
+   The command outputted a bunch of information on whether Hunks failed or
+   succeeded.
+   A few Hunks failed, giving an output of
+   Hunk #1 FAILED at 9.
+   We simply skipped these with the ENTER key
+
+7. $ git status
+   To see what the patch did. Modified many files as seen below:
+   Output:
+
+	modified:   NEWS
+	modified:   README
+	modified:   TODO
+	modified:   doc/diagmeet.note
+	modified:   ms/config.bat
+	modified:   ms/config.site
+	modified:   po/en.po
+	modified:   src/analyze.c
+	modified:   src/cmp.c
+	modified:   src/context.c
+	modified:   src/diff.c
+	modified:   src/diff.h
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/ifdef.c
+	modified:   src/io.c
+	modified:   src/sdiff.c
+	modified:   src/side.c
+	modified:   src/system.h
+	modified:   src/util.c
+	modified:   tests/help-version
+
+   All these files are untracked.
+
+8. Did research on the EMACS commands vc-diff, vc-revert, and diff-apply.
+
+9. For all non .c files:
+   $ emacs [file name]
+   C-x v u
+   yes
+   C-x C-c
+
+   (We did this for these files: NEWS, README, TODO, doc/diagmeet.note,
+   ms/config.bat, ms/config.site, po/en.po, src/diff.h, src/system.h, and
+   tests/help-version)
+
+   For all .c files:
+   $ emacs [file name]
+   C-x v =
+   C-u C-c C-a (for every hunk that is not to character string constants)
+   C-x C-c
+   y
+
+   (We did this for these files: src/analyze.c, src/cmp.c, src/context.c,
+   src/diff.c, src/diff3.c, src/dir.c, src/ifdef.c, src/io.c, src/sdiff.c,
+   src/side.c, and src/util.c)
+
+   We revert hunks that change the quotes in comments, not the ones that change
+   quotes in the actual code.
+
+10. $ ls src/*.c.rej
+    Find the rejected patches
+
+    $ emacs src/*.c (for each corresponding .c file for each rejected patch)
+    C-s (repeatedly try to find backticks and replace them with ' if it is not
+    `    in a comment)
+    *replace with '*
+    C-x C-s
+    C-x C-c
+
+    (We did this for these files: src/diff3.c and src/diff.c)
+
+11. $ git clean -f
+    Remove all untracked files
+
+12. $ git status
+    Output:
+    	modified:   src/cmp.c
+	modified:   src/diff.c
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/sdiff.c
+    (6 modified files as expected)
+
+    $ git diff > quote-3.0-patch.txt
+    Pipe the output of git diff into a patch file called quote-3.0-patch.txt.
+
+    $ cat quote-3.0-patch.txt | wc -l
+    See how many lines are in the patch file and it is 326 which is in the
+    range to be expected.
+
+13. I am on lnxsrv05 so I do not need to apply the additional patch.
+    $ nano README-hacking
+    Read how to use the commands to build the new version.
+
+    $ ./bootstrap
+    Get other files needed to build from other source packages
+
+    $ ./configure
+    $ make
+    $ make check
+    To compile and build
+
+    $ ./src/diff . -
+    Check if it functions properly
+    Output:
+    ./src/diff: cannot compare '-' to a directory
+
+    We see the ` is not a '
+
+    $ ./src/diff --help
+    Output:
+    Usage: ./src/diff [OPTION]... FILES
+Compare files line by line.
+
+  -i  --ignore-case  Ignore case differences in file contents.
+  --ignore-file-name-case  Ignore case when comparing file names.
+  --no-ignore-file-name-case  Consider case when comparing file names.
+  -E  --ignore-tab-expansion  Ignore changes due to tab expansion.
+  -b  --ignore-space-change  Ignore changes in the amount of white space.
+  -w  --ignore-all-space  Ignore all white space.
+  -B  --ignore-blank-lines  Ignore changes whose lines are all blank.
+  -I RE  --ignore-matching-lines=RE  Ignore changes whose lines all match RE.
+  --strip-trailing-cr  Strip trailing carriage return on input.
+  -a  --text  Treat all files as text.
+
+  -c  -C NUM  --context[=NUM]  Output NUM (default 3) lines of copied context.
+  -u  -U NUM  --unified[=NUM]  Output NUM (default 3) lines of unified context.
+    --label LABEL  Use LABEL instead of file name.
+    -p  --show-c-function  Show which C function each change is in.
+    -F RE  --show-function-line=RE  Show the most recent line matching RE.
+  -q  --brief  Output only whether files differ.
+  -e  --ed  Output an ed script.
+  --normal  Output a normal diff.
+  -n  --rcs  Output an RCS format diff.
+  -y  --side-by-side  Output in two columns.
+    -W NUM  --width=NUM  Output at most NUM (default 130) print columns.
+    --left-column  Output only the left column of common lines.
+    --suppress-common-lines  Do not output common lines.
+  -D NAME  --ifdef=NAME  Output merged file to show '#ifdef NAME' diffs.
+  --GTYPE-group-format=GFMT  Similar, but format GTYPE input groups with GFMT.
+  --line-format=LFMT  Similar, but format all input lines with LFMT.
+  --LTYPE-line-format=LFMT  Similar, but format LTYPE input lines with LFMT.
+    LTYPE is 'old', 'new', or 'unchanged'.  GTYPE is LTYPE or 'changed'.
+    GFMT may contain:
+      %<  lines from FILE1
+      %>  lines from FILE2
+      %=  lines common to FILE1 and FILE2
+      %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER
+        LETTERs are as follows for new group, lower case for old group:
+          F  first line number
+          L  last line number
+          N  number of lines = L-F+1
+          E  F-1
+          M  L+1
+    LFMT may contain:
+      %L  contents of line
+      %l  contents of line, excluding any trailing newline
+      %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number
+    Either GFMT or LFMT may contain:
+      %%  %
+      %c'C'  the single character C
+      %c'\OOO'  the character with octal code OOO
+
+  -l  --paginate  Pass the output through 'pr' to paginate it.
+  -t  --expand-tabs  Expand tabs to spaces in output.
+  -T  --initial-tab  Make tabs line up by prepending a tab.
+  --tabsize=NUM  Tab stops are every NUM (default 8) print columns.
+  --suppress-blank-empty  Suppress space or tab before empty output lines.
+
+  -r  --recursive  Recursively compare any subdirectories found.
+  -N  --new-file  Treat absent files as empty.
+  --unidirectional-new-file  Treat absent first files as empty.
+  -s  --report-identical-files  Report when two files are the same.
+  -x PAT  --exclude=PAT  Exclude files that match PAT.
+  -X FILE  --exclude-from=FILE  Exclude files that match any pattern in FILE.
+  -S FILE  --starting-file=FILE  Start with FILE when comparing directories.
+  --from-file=FILE1  Compare FILE1 to all operands.  FILE1 can be a directory.
+  --to-file=FILE2  Compare all operands to FILE2.  FILE2 can be a directory.
+
+  --horizon-lines=NUM  Keep NUM lines of the common prefix and suffix.
+  -d  --minimal  Try hard to find a smaller set of changes.
+  --speed-large-files  Assume large files and many scattered small changes.
+
+  -v  --version  Output version info.
+  --help  Output this help.
+
+FILES are 'FILE1 FILE2' or 'DIR1 DIR2' or 'DIR FILE...' or 'FILE... DIR'.
+If --from-file or --to-file is given, there are no restrictions on FILES.
+If a FILE is '-', read standard input.
+Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
+
+     (There are no ` in the output)
+
+14. Santity Check
+    $ cd ..
+    $ git clone https://git.savannah.gnu.org/git/diffutils.git diffutils-3.0
+    $ cd diffutils-3.0
+    $ git checkout v3.0
+    $ cd ..
+    $ mkdir mkdir diffutils-3.0-patch
+    $ cp ./diffutils/src/*.c ./diffutils-3.0-patch/
+    $ ./diffutils/src/diff -pru diffutils-3.0/src diffutils-3.0-patch > quote-3.0-test.txt
+
+    We look at the file quote-3.0-test.txt and inspect the differences and make
+    sure the only differences are changing ` to ' in the code only.
+
+15. $ diff -u quote-3.0-test.txt diffutils/quote-3.0-patch.txt
+    Compare the contents of quote-3.0-test.txt and quote-3.0-patch.txt
+
+    The differences are innocuous because most of the differences are different
+    paths and using ` instead of ' .
+
+    Output:
+    --- quote-3.0-test.txt	2019-03-14 00:59:16.723395000 -0700
++++ diffutils/quote-3.0-patch.txt	2019-03-14 00:28:17.902318000 -0700
+@@ -1,7 +1,8 @@
+-diff -pru diffutils-3.0/src/cmp.c diffutils-3.0-patch/cmp.c
+---- diffutils-3.0/src/cmp.c	2019-03-14 00:57:26.783244000 -0700
+-+++ diffutils-3.0-patch/cmp.c	2019-03-14 00:58:32.264728000 -0700
+-@@ -115,7 +115,7 @@ try_help (char const *reason_msgid, char
++diff --git a/src/cmp.c b/src/cmp.c
++index 2455dc4..e19f013 100644
++--- a/src/cmp.c
+++++ b/src/cmp.c
++@@ -115,7 +115,7 @@ try_help (char const *reason_msgid, char const *operand)
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+    error (EXIT_TROUBLE, 0,
+@@ -10,7 +11,7 @@
+    abort ();
+  }
+  
+-@@ -134,7 +134,7 @@ specify_ignore_initial (int f, char **ar
++@@ -134,7 +134,7 @@ specify_ignore_initial (int f, char **argptr, char delimiter)
+    if (! (e == LONGINT_OK
+  	 || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
+        || TYPE_MAXIMUM (off_t) < val)
+@@ -55,77 +56,10 @@
+  
+    for (f = 0; f < 2; f++)
+      {
+-diff -pru diffutils-3.0/src/diff3.c diffutils-3.0-patch/diff3.c
+---- diffutils-3.0/src/diff3.c	2019-03-14 00:57:26.802244000 -0700
+-+++ diffutils-3.0-patch/diff3.c	2019-03-14 00:58:32.271721000 -0700
+-@@ -316,9 +316,9 @@ main (int argc, char **argv)
+-   if (argc - optind != 3)
+-     {
+-       if (argc - optind < 3)
+--	try_help ("missing operand after `%s'", argv[argc - 1]);
+-+	try_help ("missing operand after '%s'", argv[argc - 1]);
+-       else
+--	try_help ("extra operand `%s'", argv[optind + 3]);
+-+	try_help ("extra operand '%s'", argv[optind + 3]);
+-     }
+- 
+-   file = &argv[optind];
+-@@ -351,7 +351,7 @@ main (int argc, char **argv)
+- 	 file instead.  */
+-       common = 3 - common;
+-       if (STREQ (file[0], "-") || STREQ (file[common], "-"))
+--	fatal ("`-' specified for more than one input file");
+-+	fatal ("'-' specified for more than one input file");
+-     }
+- 
+-   mapping[0] = 0;
+-@@ -412,7 +412,7 @@ try_help (char const *reason_msgid, char
+-   if (reason_msgid)
+-     error (0, 0, _(reason_msgid), operand);
+-   error (EXIT_TROUBLE, 0,
+--	 _("Try `%s --help' for more information."), program_name);
+-+	 _("Try '%s --help' for more information."), program_name);
+-   abort ();
+- }
+- 
+-@@ -435,7 +435,7 @@ static char const * const option_help_ms
+-   "",
+-   N_("-m  --merge  Output merged file instead of ed script (default -A)."),
+-   N_("-L LABEL  --label=LABEL  Use LABEL instead of file name."),
+--  N_("-i  Append `w' and `q' commands to ed scripts."),
+-+  N_("-i  Append 'w' and 'q' commands to ed scripts."),
+-   N_("-a  --text  Treat all files as text."),
+-   N_("--strip-trailing-cr  Strip trailing carriage return on input."),
+-   N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
+-@@ -460,7 +460,7 @@ usage (void)
+-     else
+-       putchar ('\n');
+-   printf ("\n%s\n%s\n",
+--	  _("If a FILE is `-', read standard input."),
+-+	  _("If a FILE is '-', read standard input."),
+- 	  _("Exit status is 0 if successful, 1 if conflicts, 2 if trouble."));
+-   emit_bug_reporting_address ();
+- }
+-@@ -1275,12 +1275,12 @@ read_diff (char const *filea,
+-   if (EXIT_TROUBLE <= status)
+-     error (EXIT_TROUBLE, werrno,
+- 	   _(status == 126
+--	     ? "subsidiary program `%s' could not be invoked"
+-+	     ? "subsidiary program '%s' could not be invoked"
+- 	     : status == 127
+--	     ? "subsidiary program `%s' not found"
+-+	     ? "subsidiary program '%s' not found"
+- 	     : status == INT_MAX
+--	     ? "subsidiary program `%s' failed"
+--	     : "subsidiary program `%s' failed (exit status %d)"),
+-+	     ? "subsidiary program '%s' failed"
+-+	     : "subsidiary program '%s' failed (exit status %d)"),
+- 	   diff_program, status);
+- 
+-   return diff_result + total;
+-diff -pru diffutils-3.0/src/diff.c diffutils-3.0-patch/diff.c
+---- diffutils-3.0/src/diff.c	2019-03-14 00:57:26.793244000 -0700
+-+++ diffutils-3.0-patch/diff.c	2019-03-14 00:58:32.274718000 -0700
++diff --git a/src/diff.c b/src/diff.c
++index cc1b611..256a984 100644
++--- a/src/diff.c
+++++ b/src/diff.c
+ @@ -330,7 +330,7 @@ main (int argc, char **argv)
+  	      {
+  		numval = strtoumax (optarg, &numend, 10);
+@@ -174,7 +108,7 @@
+  	    }
+  
+  	  exit_status = compare_files (NULL, argv[optind], argv[optind + 1]);
+-@@ -826,7 +826,7 @@ try_help (char const *reason_msgid, char
++@@ -826,7 +826,7 @@ try_help (char const *reason_msgid, char const *operand)
+  {
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+@@ -183,7 +117,7 @@
+  	 program_name);
+    abort ();
+  }
+-@@ -870,11 +870,11 @@ static char const * const option_help_ms
++@@ -870,11 +870,11 @@ static char const * const option_help_msgid[] = {
+    -W NUM  --width=NUM  Output at most NUM (default 130) print columns.\n\
+    --left-column  Output only the left column of common lines.\n\
+    --suppress-common-lines  Do not output common lines."),
+@@ -197,7 +131,7 @@
+    N_("  GFMT may contain:\n\
+      %<  lines from FILE1\n\
+      %>  lines from FILE2\n\
+-@@ -895,7 +895,7 @@ static char const * const option_help_ms
++@@ -895,7 +895,7 @@ static char const * const option_help_msgid[] = {
+      %c'C'  the single character C\n\
+      %c'\\OOO'  the character with octal code OOO"),
+    "",
+@@ -206,7 +140,7 @@
+    N_("-t  --expand-tabs  Expand tabs to spaces in output."),
+    N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
+    N_("--tabsize=NUM  Tab stops are every NUM (default 8) print columns."),
+-@@ -918,9 +918,9 @@ static char const * const option_help_ms
++@@ -918,9 +918,9 @@ static char const * const option_help_msgid[] = {
+    N_("-v  --version  Output version info."),
+    N_("--help  Output this help."),
+    "",
+@@ -218,7 +152,7 @@
+    N_("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."),
+    0
+  };
+-@@ -960,7 +960,7 @@ specify_value (char const **var, char co
++@@ -960,7 +960,7 @@ specify_value (char const **var, char const *value, char const *option)
+  {
+    if (*var && strcmp (*var, value) != 0)
+      {
+@@ -227,7 +161,7 @@
+        try_help (NULL, NULL);
+      }
+    *var = value;
+-@@ -1159,7 +1159,7 @@ compare_files (struct comparison const *
++@@ -1159,7 +1159,7 @@ compare_files (struct comparison const *parent,
+  	= dir_file_pathname (dir, last_component (fnm));
+  
+        if (STREQ (fnm, "-"))
+@@ -236,11 +170,80 @@
+  
+        if (stat (filename, &cmp.file[dir_arg].stat) != 0)
+  	{
+-Only in diffutils-3.0/src: diff.h
+-diff -pru diffutils-3.0/src/dir.c diffutils-3.0-patch/dir.c
+---- diffutils-3.0/src/dir.c	2019-03-14 00:57:26.808243000 -0700
+-+++ diffutils-3.0-patch/dir.c	2019-03-14 00:58:32.277716000 -0700
+-@@ -154,7 +154,7 @@ compare_names (char const *name1, char c
++diff --git a/src/diff3.c b/src/diff3.c
++index 0f11fdc..fbfb28b 100644
++--- a/src/diff3.c
+++++ b/src/diff3.c
++@@ -316,9 +316,9 @@ main (int argc, char **argv)
++   if (argc - optind != 3)
++     {
++       if (argc - optind < 3)
++-	try_help ("missing operand after `%s'", argv[argc - 1]);
+++	try_help ("missing operand after '%s'", argv[argc - 1]);
++       else
++-	try_help ("extra operand `%s'", argv[optind + 3]);
+++	try_help ("extra operand '%s'", argv[optind + 3]);
++     }
++ 
++   file = &argv[optind];
++@@ -351,7 +351,7 @@ main (int argc, char **argv)
++ 	 file instead.  */
++       common = 3 - common;
++       if (STREQ (file[0], "-") || STREQ (file[common], "-"))
++-	fatal ("`-' specified for more than one input file");
+++	fatal ("'-' specified for more than one input file");
++     }
++ 
++   mapping[0] = 0;
++@@ -412,7 +412,7 @@ try_help (char const *reason_msgid, char const *operand)
++   if (reason_msgid)
++     error (0, 0, _(reason_msgid), operand);
++   error (EXIT_TROUBLE, 0,
++-	 _("Try `%s --help' for more information."), program_name);
+++	 _("Try '%s --help' for more information."), program_name);
++   abort ();
++ }
++ 
++@@ -435,7 +435,7 @@ static char const * const option_help_msgid[] = {
++   "",
++   N_("-m  --merge  Output merged file instead of ed script (default -A)."),
++   N_("-L LABEL  --label=LABEL  Use LABEL instead of file name."),
++-  N_("-i  Append `w' and `q' commands to ed scripts."),
+++  N_("-i  Append 'w' and 'q' commands to ed scripts."),
++   N_("-a  --text  Treat all files as text."),
++   N_("--strip-trailing-cr  Strip trailing carriage return on input."),
++   N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
++@@ -460,7 +460,7 @@ usage (void)
++     else
++       putchar ('\n');
++   printf ("\n%s\n%s\n",
++-	  _("If a FILE is `-', read standard input."),
+++	  _("If a FILE is '-', read standard input."),
++ 	  _("Exit status is 0 if successful, 1 if conflicts, 2 if trouble."));
++   emit_bug_reporting_address ();
++ }
++@@ -1275,12 +1275,12 @@ read_diff (char const *filea,
++   if (EXIT_TROUBLE <= status)
++     error (EXIT_TROUBLE, werrno,
++ 	   _(status == 126
++-	     ? "subsidiary program `%s' could not be invoked"
+++	     ? "subsidiary program '%s' could not be invoked"
++ 	     : status == 127
++-	     ? "subsidiary program `%s' not found"
+++	     ? "subsidiary program '%s' not found"
++ 	     : status == INT_MAX
++-	     ? "subsidiary program `%s' failed"
++-	     : "subsidiary program `%s' failed (exit status %d)"),
+++	     ? "subsidiary program '%s' failed"
+++	     : "subsidiary program '%s' failed (exit status %d)"),
++ 	   diff_program, status);
++ 
++   return diff_result + total;
++diff --git a/src/dir.c b/src/dir.c
++index 5b4eaec..5e08318 100644
++--- a/src/dir.c
+++++ b/src/dir.c
++@@ -154,7 +154,7 @@ compare_names (char const *name1, char const *name2)
+  	r = strcoll (name1, name2);
+        if (errno)
+  	{
+@@ -249,11 +252,11 @@
+  		 name1, name2);
+  	  longjmp (failed_locale_specific_sorting, 1);
+  	}
+-Only in diffutils-3.0/src: Makefile.am
+-diff -pru diffutils-3.0/src/sdiff.c diffutils-3.0-patch/sdiff.c
+---- diffutils-3.0/src/sdiff.c	2019-03-14 00:57:26.834244000 -0700
+-+++ diffutils-3.0-patch/sdiff.c	2019-03-14 00:58:32.290702000 -0700
+-@@ -175,7 +175,7 @@ try_help (char const *reason_msgid, char
++diff --git a/src/sdiff.c b/src/sdiff.c
++index 4344e8d..5bbecd8 100644
++--- a/src/sdiff.c
+++++ b/src/sdiff.c
++@@ -175,7 +175,7 @@ try_help (char const *reason_msgid, char const *operand)
+  {
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+@@ -271,7 +274,7 @@
+  	  _("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."));
+    emit_bug_reporting_address ();
+  }
+-@@ -286,12 +286,12 @@ check_child_status (int werrno, int wsta
++@@ -286,12 +286,12 @@ check_child_status (int werrno, int wstatus, int max_ok_status,
+      {
+        error (0, werrno,
+  	     _(status == 126
+@@ -300,10 +303,10 @@
+      }
+  
+    if (! output)
+-Only in diffutils-3.0/src: system.h
+-diff -pru diffutils-3.0/src/util.c diffutils-3.0-patch/util.c
+---- diffutils-3.0/src/util.c	2019-03-14 00:57:26.872244000 -0700
+-+++ diffutils-3.0-patch/util.c	2019-03-14 00:58:32.295697000 -0700
++diff --git a/src/util.c b/src/util.c
++index 3be03e9..d18bf38 100644
++--- a/src/util.c
+++++ b/src/util.c
+ @@ -298,12 +298,12 @@ finish_output (void)
+        if (status)
+  	error (EXIT_TROUBLE, werrno,
+[classvwt@lnxsrv05 ~/35L/Assignment9]$ diff -u quote-3.0-test.txt diffutils/quote-3.0-patch.txt
+--- quote-3.0-test.txt	2019-03-14 00:59:16.723395000 -0700
++++ diffutils/quote-3.0-patch.txt	2019-03-14 00:28:17.902318000 -0700
+@@ -1,7 +1,8 @@
+-diff -pru diffutils-3.0/src/cmp.c diffutils-3.0-patch/cmp.c
+---- diffutils-3.0/src/cmp.c	2019-03-14 00:57:26.783244000 -0700
+-+++ diffutils-3.0-patch/cmp.c	2019-03-14 00:58:32.264728000 -0700
+-@@ -115,7 +115,7 @@ try_help (char const *reason_msgid, char
++diff --git a/src/cmp.c b/src/cmp.c
++index 2455dc4..e19f013 100644
++--- a/src/cmp.c
+++++ b/src/cmp.c
++@@ -115,7 +115,7 @@ try_help (char const *reason_msgid, char const *operand)
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+    error (EXIT_TROUBLE, 0,
+@@ -10,7 +11,7 @@
+    abort ();
+  }
+  
+-@@ -134,7 +134,7 @@ specify_ignore_initial (int f, char **ar
++@@ -134,7 +134,7 @@ specify_ignore_initial (int f, char **argptr, char delimiter)
+    if (! (e == LONGINT_OK
+  	 || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
+        || TYPE_MAXIMUM (off_t) < val)
+@@ -55,77 +56,10 @@
+  
+    for (f = 0; f < 2; f++)
+      {
+-diff -pru diffutils-3.0/src/diff3.c diffutils-3.0-patch/diff3.c
+---- diffutils-3.0/src/diff3.c	2019-03-14 00:57:26.802244000 -0700
+-+++ diffutils-3.0-patch/diff3.c	2019-03-14 00:58:32.271721000 -0700
+-@@ -316,9 +316,9 @@ main (int argc, char **argv)
+-   if (argc - optind != 3)
+-     {
+-       if (argc - optind < 3)
+--	try_help ("missing operand after `%s'", argv[argc - 1]);
+-+	try_help ("missing operand after '%s'", argv[argc - 1]);
+-       else
+--	try_help ("extra operand `%s'", argv[optind + 3]);
+-+	try_help ("extra operand '%s'", argv[optind + 3]);
+-     }
+- 
+-   file = &argv[optind];
+-@@ -351,7 +351,7 @@ main (int argc, char **argv)
+- 	 file instead.  */
+-       common = 3 - common;
+-       if (STREQ (file[0], "-") || STREQ (file[common], "-"))
+--	fatal ("`-' specified for more than one input file");
+-+	fatal ("'-' specified for more than one input file");
+-     }
+- 
+-   mapping[0] = 0;
+-@@ -412,7 +412,7 @@ try_help (char const *reason_msgid, char
+-   if (reason_msgid)
+-     error (0, 0, _(reason_msgid), operand);
+-   error (EXIT_TROUBLE, 0,
+--	 _("Try `%s --help' for more information."), program_name);
+-+	 _("Try '%s --help' for more information."), program_name);
+-   abort ();
+- }
+- 
+-@@ -435,7 +435,7 @@ static char const * const option_help_ms
+-   "",
+-   N_("-m  --merge  Output merged file instead of ed script (default -A)."),
+-   N_("-L LABEL  --label=LABEL  Use LABEL instead of file name."),
+--  N_("-i  Append `w' and `q' commands to ed scripts."),
+-+  N_("-i  Append 'w' and 'q' commands to ed scripts."),
+-   N_("-a  --text  Treat all files as text."),
+-   N_("--strip-trailing-cr  Strip trailing carriage return on input."),
+-   N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
+-@@ -460,7 +460,7 @@ usage (void)
+-     else
+-       putchar ('\n');
+-   printf ("\n%s\n%s\n",
+--	  _("If a FILE is `-', read standard input."),
+-+	  _("If a FILE is '-', read standard input."),
+- 	  _("Exit status is 0 if successful, 1 if conflicts, 2 if trouble."));
+-   emit_bug_reporting_address ();
+- }
+-@@ -1275,12 +1275,12 @@ read_diff (char const *filea,
+-   if (EXIT_TROUBLE <= status)
+-     error (EXIT_TROUBLE, werrno,
+- 	   _(status == 126
+--	     ? "subsidiary program `%s' could not be invoked"
+-+	     ? "subsidiary program '%s' could not be invoked"
+- 	     : status == 127
+--	     ? "subsidiary program `%s' not found"
+-+	     ? "subsidiary program '%s' not found"
+- 	     : status == INT_MAX
+--	     ? "subsidiary program `%s' failed"
+--	     : "subsidiary program `%s' failed (exit status %d)"),
+-+	     ? "subsidiary program '%s' failed"
+-+	     : "subsidiary program '%s' failed (exit status %d)"),
+- 	   diff_program, status);
+- 
+-   return diff_result + total;
+-diff -pru diffutils-3.0/src/diff.c diffutils-3.0-patch/diff.c
+---- diffutils-3.0/src/diff.c	2019-03-14 00:57:26.793244000 -0700
+-+++ diffutils-3.0-patch/diff.c	2019-03-14 00:58:32.274718000 -0700
++diff --git a/src/diff.c b/src/diff.c
++index cc1b611..256a984 100644
++--- a/src/diff.c
+++++ b/src/diff.c
+ @@ -330,7 +330,7 @@ main (int argc, char **argv)
+  	      {
+  		numval = strtoumax (optarg, &numend, 10);
+@@ -174,7 +108,7 @@
+  	    }
+  
+  	  exit_status = compare_files (NULL, argv[optind], argv[optind + 1]);
+-@@ -826,7 +826,7 @@ try_help (char const *reason_msgid, char
++@@ -826,7 +826,7 @@ try_help (char const *reason_msgid, char const *operand)
+  {
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+@@ -183,7 +117,7 @@
+  	 program_name);
+    abort ();
+  }
+-@@ -870,11 +870,11 @@ static char const * const option_help_ms
++@@ -870,11 +870,11 @@ static char const * const option_help_msgid[] = {
+    -W NUM  --width=NUM  Output at most NUM (default 130) print columns.\n\
+    --left-column  Output only the left column of common lines.\n\
+    --suppress-common-lines  Do not output common lines."),
+@@ -197,7 +131,7 @@
+    N_("  GFMT may contain:\n\
+      %<  lines from FILE1\n\
+      %>  lines from FILE2\n\
+-@@ -895,7 +895,7 @@ static char const * const option_help_ms
++@@ -895,7 +895,7 @@ static char const * const option_help_msgid[] = {
+      %c'C'  the single character C\n\
+      %c'\\OOO'  the character with octal code OOO"),
+    "",
+@@ -206,7 +140,7 @@
+    N_("-t  --expand-tabs  Expand tabs to spaces in output."),
+    N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
+    N_("--tabsize=NUM  Tab stops are every NUM (default 8) print columns."),
+-@@ -918,9 +918,9 @@ static char const * const option_help_ms
++@@ -918,9 +918,9 @@ static char const * const option_help_msgid[] = {
+    N_("-v  --version  Output version info."),
+    N_("--help  Output this help."),
+    "",
+@@ -218,7 +152,7 @@
+    N_("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."),
+    0
+  };
+-@@ -960,7 +960,7 @@ specify_value (char const **var, char co
++@@ -960,7 +960,7 @@ specify_value (char const **var, char const *value, char const *option)
+  {
+    if (*var && strcmp (*var, value) != 0)
+      {
+@@ -227,7 +161,7 @@
+        try_help (NULL, NULL);
+      }
+    *var = value;
+-@@ -1159,7 +1159,7 @@ compare_files (struct comparison const *
++@@ -1159,7 +1159,7 @@ compare_files (struct comparison const *parent,
+  	= dir_file_pathname (dir, last_component (fnm));
+  
+        if (STREQ (fnm, "-"))
+@@ -236,11 +170,80 @@
+  
+        if (stat (filename, &cmp.file[dir_arg].stat) != 0)
+  	{
+-Only in diffutils-3.0/src: diff.h
+-diff -pru diffutils-3.0/src/dir.c diffutils-3.0-patch/dir.c
+---- diffutils-3.0/src/dir.c	2019-03-14 00:57:26.808243000 -0700
+-+++ diffutils-3.0-patch/dir.c	2019-03-14 00:58:32.277716000 -0700
+-@@ -154,7 +154,7 @@ compare_names (char const *name1, char c
++diff --git a/src/diff3.c b/src/diff3.c
++index 0f11fdc..fbfb28b 100644
++--- a/src/diff3.c
+++++ b/src/diff3.c
++@@ -316,9 +316,9 @@ main (int argc, char **argv)
++   if (argc - optind != 3)
++     {
++       if (argc - optind < 3)
++-	try_help ("missing operand after `%s'", argv[argc - 1]);
+++	try_help ("missing operand after '%s'", argv[argc - 1]);
++       else
++-	try_help ("extra operand `%s'", argv[optind + 3]);
+++	try_help ("extra operand '%s'", argv[optind + 3]);
++     }
++ 
++   file = &argv[optind];
++@@ -351,7 +351,7 @@ main (int argc, char **argv)
++ 	 file instead.  */
++       common = 3 - common;
++       if (STREQ (file[0], "-") || STREQ (file[common], "-"))
++-	fatal ("`-' specified for more than one input file");
+++	fatal ("'-' specified for more than one input file");
++     }
++ 
++   mapping[0] = 0;
++@@ -412,7 +412,7 @@ try_help (char const *reason_msgid, char const *operand)
++   if (reason_msgid)
++     error (0, 0, _(reason_msgid), operand);
++   error (EXIT_TROUBLE, 0,
++-	 _("Try `%s --help' for more information."), program_name);
+++	 _("Try '%s --help' for more information."), program_name);
++   abort ();
++ }
++ 
++@@ -435,7 +435,7 @@ static char const * const option_help_msgid[] = {
++   "",
++   N_("-m  --merge  Output merged file instead of ed script (default -A)."),
++   N_("-L LABEL  --label=LABEL  Use LABEL instead of file name."),
++-  N_("-i  Append `w' and `q' commands to ed scripts."),
+++  N_("-i  Append 'w' and 'q' commands to ed scripts."),
++   N_("-a  --text  Treat all files as text."),
++   N_("--strip-trailing-cr  Strip trailing carriage return on input."),
++   N_("-T  --initial-tab  Make tabs line up by prepending a tab."),
++@@ -460,7 +460,7 @@ usage (void)
++     else
++       putchar ('\n');
++   printf ("\n%s\n%s\n",
++-	  _("If a FILE is `-', read standard input."),
+++	  _("If a FILE is '-', read standard input."),
++ 	  _("Exit status is 0 if successful, 1 if conflicts, 2 if trouble."));
++   emit_bug_reporting_address ();
++ }
++@@ -1275,12 +1275,12 @@ read_diff (char const *filea,
++   if (EXIT_TROUBLE <= status)
++     error (EXIT_TROUBLE, werrno,
++ 	   _(status == 126
++-	     ? "subsidiary program `%s' could not be invoked"
+++	     ? "subsidiary program '%s' could not be invoked"
++ 	     : status == 127
++-	     ? "subsidiary program `%s' not found"
+++	     ? "subsidiary program '%s' not found"
++ 	     : status == INT_MAX
++-	     ? "subsidiary program `%s' failed"
++-	     : "subsidiary program `%s' failed (exit status %d)"),
+++	     ? "subsidiary program '%s' failed"
+++	     : "subsidiary program '%s' failed (exit status %d)"),
++ 	   diff_program, status);
++ 
++   return diff_result + total;
++diff --git a/src/dir.c b/src/dir.c
++index 5b4eaec..5e08318 100644
++--- a/src/dir.c
+++++ b/src/dir.c
++@@ -154,7 +154,7 @@ compare_names (char const *name1, char const *name2)
+  	r = strcoll (name1, name2);
+        if (errno)
+  	{
+@@ -249,11 +252,11 @@
+  		 name1, name2);
+  	  longjmp (failed_locale_specific_sorting, 1);
+  	}
+-Only in diffutils-3.0/src: Makefile.am
+-diff -pru diffutils-3.0/src/sdiff.c diffutils-3.0-patch/sdiff.c
+---- diffutils-3.0/src/sdiff.c	2019-03-14 00:57:26.834244000 -0700
+-+++ diffutils-3.0-patch/sdiff.c	2019-03-14 00:58:32.290702000 -0700
+-@@ -175,7 +175,7 @@ try_help (char const *reason_msgid, char
++diff --git a/src/sdiff.c b/src/sdiff.c
++index 4344e8d..5bbecd8 100644
++--- a/src/sdiff.c
+++++ b/src/sdiff.c
++@@ -175,7 +175,7 @@ try_help (char const *reason_msgid, char const *operand)
+  {
+    if (reason_msgid)
+      error (0, 0, _(reason_msgid), operand);
+@@ -271,7 +274,7 @@
+  	  _("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."));
+    emit_bug_reporting_address ();
+  }
+-@@ -286,12 +286,12 @@ check_child_status (int werrno, int wsta
++@@ -286,12 +286,12 @@ check_child_status (int werrno, int wstatus, int max_ok_status,
+      {
+        error (0, werrno,
+  	     _(status == 126
+@@ -300,10 +303,10 @@
+      }
+  
+    if (! output)
+-Only in diffutils-3.0/src: system.h
+-diff -pru diffutils-3.0/src/util.c diffutils-3.0-patch/util.c
+---- diffutils-3.0/src/util.c	2019-03-14 00:57:26.872244000 -0700
+-+++ diffutils-3.0-patch/util.c	2019-03-14 00:58:32.295697000 -0700
++diff --git a/src/util.c b/src/util.c
++index 3be03e9..d18bf38 100644
++--- a/src/util.c
+++++ b/src/util.c
+ @@ -298,12 +298,12 @@ finish_output (void)
+        if (status)
+  	error (EXIT_TROUBLE, werrno,
